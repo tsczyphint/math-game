@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧠 數學冒險王 Pro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Baloo+2:wght@700;800;900&display=swap');
+:root{--bg:#07050f;--card:#12102a;--card2:#1a1840;--accent:#818cf8;--gold:#fbbf24;--text:#f0edff;--sub:#7c78a8;--border:rgba(129,140,248,0.15)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(1px 1px at 8% 12%,rgba(255,255,255,.7) 0%,transparent 100%),radial-gradient(1px 1px at 22% 55%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1px 1px at 45% 28%,rgba(255,255,255,.8) 0%,transparent 100%),radial-gradient(1px 1px at 65% 75%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1px 1px at 80% 18%,rgba(255,255,255,.6) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 58% 8%,rgba(180,160,255,.9) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 12% 82%,rgba(180,160,255,.7) 0%,transparent 100%),radial-gradient(1px 1px at 75% 35%,rgba(255,255,255,.6) 0%,transparent 100%);pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:16px 14px 80px}
+.header{text-align:center;padding:16px 0 6px}
+.title{font-family:'Baloo 2',cursive;font-size:clamp(1.8rem,7vw,3rem);font-weight:900;background:linear-gradient(135deg,#c084fc,#818cf8,#38bdf8,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:4px}
+.subtitle{color:var(--sub);font-size:.85rem}
+.scorebar{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:10px 16px;margin:12px 0;gap:6px;flex-wrap:wrap}
+.si{text-align:center;flex:1;min-width:50px}
+.si .v{font-family:'Baloo 2',cursive;font-size:1.45rem;font-weight:800;color:var(--gold);line-height:1}
+.si .l{font-size:.6rem;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+.diff-section{margin:12px 0}
+.diff-section h3{font-size:.75rem;color:var(--sub);margin-bottom:7px;text-transform:uppercase;letter-spacing:1px}
+.diff-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.db{padding:8px 4px;border:2px solid transparent;border-radius:11px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:all .2s;background:var(--card2);color:var(--sub);line-height:1.3}
+.db span{display:block;font-size:.62rem;font-weight:600;margin-top:1px;opacity:.7}
+.db.easy{border-color:#22d3ee30}.db.medium{border-color:#fb923c30}.db.hard{border-color:#f43f5e30}.db.hell{border-color:#a855f730}
+.db.easy.on{background:#22d3ee18;border-color:#22d3ee;color:#22d3ee;box-shadow:0 0 16px #22d3ee30}
+.db.medium.on{background:#fb923c18;border-color:#fb923c;color:#fb923c;box-shadow:0 0 16px #fb923c30}
+.db.hard.on{background:#f43f5e18;border-color:#f43f5e;color:#f43f5e;box-shadow:0 0 16px #f43f5e30}
+.db.hell.on{background:#a855f718;border-color:#a855f7;color:#a855f7;box-shadow:0 0 16px #a855f730}
+.type-tabs{display:flex;gap:6px;margin:12px 0;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.type-tabs::-webkit-scrollbar{display:none}
+.tt{flex-shrink:0;padding:7px 13px;border-radius:20px;border:1.5px solid rgba(129,140,248,.2);background:var(--card);color:var(--sub);font-size:.8rem;font-weight:800;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tt.on{background:linear-gradient(135deg,#6d28d9,#4338ca);border-color:transparent;color:#fff;box-shadow:0 4px 14px #6d28d960}
+.progress-wrap{margin:6px 0 10px}
+.pdots{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
+.dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.1);transition:all .25s}
+.dot.ok{background:#22d3ee}.dot.no{background:#f43f5e}.dot.tm{background:#6b7280}
+.dot.cur{background:var(--accent);transform:scale(1.5);box-shadow:0 0 6px var(--accent)}
+.plabel{font-size:.68rem;color:var(--sub);text-align:center;margin-top:5px}
+.qcard{background:linear-gradient(145deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--border);border-radius:22px;padding:20px 18px;margin:0 0 10px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative;overflow:hidden}
+.twrap{width:100%;display:flex;align-items:center;gap:8px}
+.tbar-bg{flex:1;background:rgba(255,255,255,.07);border-radius:8px;height:7px;overflow:hidden}
+.tbar{height:7px;border-radius:8px;background:linear-gradient(90deg,#818cf8,#38bdf8);transition:width .25s linear;width:100%}
+.tbar.warn{background:linear-gradient(90deg,#fb923c,#f43f5e);animation:pulse .6s infinite alternate}
+@keyframes pulse{from{opacity:1}to{opacity:.6}}
+.tnum{font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:800;color:var(--gold);min-width:26px;text-align:right}
+.qlabel{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:1.2px}
+.qtext{font-family:'Baloo 2',cursive;font-size:clamp(1.4rem,5vw,2.2rem);font-weight:800;text-align:center;color:#fff;line-height:1.3;width:100%}
+.seq-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center}
+.sc{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;background:rgba(129,140,248,.1);border:2px solid rgba(129,140,248,.22);color:#fff;font-family:'Baloo 2',cursive}
+.sc.blank{background:rgba(129,140,248,.04);border:2.5px dashed rgba(129,140,248,.55);color:var(--accent);font-size:1.4rem}
+.sarr{color:var(--sub);font-size:.85rem;flex-shrink:0}
+.shape-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+.shc{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:1.55rem;border-radius:11px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.09)}
+.shc.blank{border:2.5px dashed var(--accent);background:rgba(129,140,248,.08);color:var(--accent)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:4px}
+.cb{padding:12px 8px;border-radius:13px;border:2px solid rgba(129,140,248,.2);background:var(--card2);color:#fff;font-family:'Baloo 2',cursive;font-size:1.15rem;font-weight:800;cursor:pointer;transition:all .15s;text-align:center;line-height:1.3}
+.cb:hover:not(:disabled){border-color:var(--accent);background:rgba(129,140,248,.18);transform:translateY(-2px)}
+.cb.ok{background:#14532d33;border-color:#22d3ee;color:#22d3ee;animation:pop .3s ease}
+.cb.no{background:#7f1d1d33;border-color:#f43f5e;color:#f43f5e;animation:shake .3s ease}
+.cb:disabled{cursor:default}.cb.sm{font-size:.85rem;font-family:'Nunito',sans-serif;font-weight:800;line-height:1.4}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}100%{transform:translateX(0)}}
+.fb{text-align:center;font-size:.95rem;font-weight:800;padding:8px 12px;border-radius:12px;min-height:40px;display:flex;align-items:center;justify-content:center;transition:all .25s}
+.fb.ok{background:#14532d22;color:#4ade80}.fb.no{background:#7f1d1d22;color:#f87171}.fb.tm{background:#1f293722;color:#94a3b8}
+.controls{display:flex;gap:9px;margin-top:9px}
+.btn{flex:1;padding:12px;border-radius:13px;border:none;font-family:'Nunito',sans-serif;font-size:.93rem;font-weight:900;cursor:pointer;transition:all .2s}
+.primary{background:linear-gradient(135deg,#6d28d9,#4338ca);color:#fff;box-shadow:0 4px 16px rgba(109,40,217,.45)}
+.primary:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(109,40,217,.65)}
+.secondary{background:var(--card2);color:var(--sub);border:1.5px solid var(--border)}
+.result{display:none;text-align:center;padding:26px 18px;background:linear-gradient(145deg,var(--card),var(--card2));border-radius:22px;border:1px solid rgba(129,140,248,.25);margin:12px 0}
+.result.show{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.remoji{font-size:3.2rem;margin-bottom:6px}
+.rtitle{font-family:'Baloo 2',cursive;font-size:1.8rem;font-weight:900;margin-bottom:5px;background:linear-gradient(135deg,#c084fc,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rgrade{font-family:'Baloo 2',cursive;font-size:2.8rem;font-weight:900;color:var(--gold);margin:6px 0}
+.rsub{color:var(--sub);font-size:.88rem;margin-bottom:14px}
+.rstats{display:flex;justify-content:center;gap:12px;margin:12px 0;flex-wrap:wrap}
+.sbox{background:rgba(255,255,255,.05);border-radius:11px;padding:10px 14px;min-width:80px}
+.sbox .n{font-family:'Baloo 2',cursive;font-size:1.6rem;color:var(--gold)}
+.sbox .t{font-size:.68rem;color:var(--sub)}
+.bdown{margin:14px 0;text-align:left;background:rgba(129,140,248,.07);border-radius:13px;padding:12px 14px}
+.bdown h4{font-size:.72rem;color:var(--sub);margin-bottom:9px;text-transform:uppercase;letter-spacing:1px}
+.brow{display:flex;align-items:center;gap:9px;margin:6px 0;font-size:.83rem}
+.bdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.bbg{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.bbar{height:5px;border-radius:3px}
+.streak-badge{display:none;position:fixed;top:16px;right:16px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;font-weight:900;padding:7px 15px;border-radius:20px;font-size:.85rem;z-index:100;box-shadow:0 4px 14px rgba(251,191,36,.5);animation:badgePop .4s ease}
+@keyframes badgePop{0%{transform:scale(0) rotate(-10deg)}70%{transform:scale(1.1) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
+.visual-q-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+.visual-q-svg{display:flex;justify-content:center;align-items:center;width:100%;overflow-x:auto}
+.visual-q-svg svg{max-width:100%;max-height:220px}
+.visual-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:4px}
+.vcb{padding:8px 6px;border-radius:14px;border:2px solid rgba(129,140,248,.25);background:var(--card2);cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.vcb:hover:not(:disabled){border-color:var(--accent);background:rgba(129,140,248,.18);transform:translateY(-2px)}
+.vcb svg{max-width:160px;max-height:150px;width:auto;height:auto}
+.vcb.ok{background:#14532d33;border-color:#22d3ee;animation:pop .3s ease}
+.vcb.no{background:#7f1d1d33;border-color:#f43f5e;animation:shake .3s ease}
+.vcb:disabled{cursor:default}
+.vcb-label{font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;color:var(--sub)}
+.vcb.ok .vcb-label{color:#22d3ee}.vcb.no .vcb-label{color:#f43f5e}
+</style>
+</head>
+<body>
+<div id="badge" class="streak-badge">🔥</div>
+<div class="wrap">
+  <div class="header"><div class="title">🧠 數學冒險王 Pro</div><div class="subtitle">20題挑戰 · 5種模式 · 4種難度 · 每題60秒</div></div>
+  <div class="scorebar">
+    <div class="si"><div class="v" id="vScore">0</div><div class="l">🏆 分數</div></div>
+    <div class="si"><div class="v" id="vStreak">0</div><div class="l">🔥 連勝</div></div>
+    <div class="si"><div class="v" id="vCorrect">0</div><div class="l">✅ 答對</div></div>
+    <div class="si"><div class="v" id="vProg">-/20</div><div class="l">📝 進度</div></div>
+  </div>
+  <div class="diff-section"><h3>選擇難度</h3>
+    <div class="diff-btns">
+      <button class="db easy on" onclick="setDiff('easy',this)">🌱 簡單</button>
+      <button class="db medium" onclick="setDiff('medium',this)">⚡ 中等</button>
+      <button class="db hard" onclick="setDiff('hard',this)">🔥 困難</button>
+      <button class="db hell" onclick="setDiff('hell',this)">💀 地獄</button>
+    </div>
+  </div>
+  <div class="type-tabs">
+    <div class="tt on" onclick="setType('mix',this)">🎲 混合模式</div>
+    <div class="tt" onclick="setType('math',this)">🔢 數列規律</div>
+    <div class="tt" onclick="setType('calc',this)">➕ 四則運算</div>
+    <div class="tt" onclick="setType('shape',this)">🔷 圖形規律</div>
+    <div class="tt" onclick="setType('missing',this)">❓ 填空題</div>
+
+  </div>
+  <div class="progress-wrap"><div class="pdots" id="pdots"></div><div class="plabel" id="plabel"></div></div>
+  <div id="gameArea">
+    <div class="qcard">
+      <div class="twrap"><div class="tbar-bg"><div class="tbar" id="tbar"></div></div><div class="tnum" id="tnum">60</div></div>
+      <div class="qlabel" id="qlabel">準備好了嗎？</div>
+      <div id="qcontent" class="qtext" style="color:var(--sub);font-size:1rem;line-height:1.6">選好難度和模式<br>按下「開始遊戲」！</div>
+    </div>
+    <div class="choices" id="choices"></div>
+    <div class="fb" id="fb"></div>
+    <div class="controls">
+      <button class="btn primary" id="mainBtn" onclick="startGame()">🚀 開始遊戲</button>
+      <button class="btn secondary" onclick="resetGame()">🔄 重設</button>
+    </div>
+  </div>
+  <div class="result" id="result">
+    <div class="remoji" id="rEmoji">🎉</div><div class="rtitle" id="rTitle">太厲害了！</div>
+    <div class="rgrade" id="rGrade">S</div><div class="rsub" id="rSub">完成20題挑戰</div>
+    <div class="rstats">
+      <div class="sbox"><div class="n" id="rScore">0</div><div class="t">總分數</div></div>
+      <div class="sbox"><div class="n" id="rCorrect">0/20</div><div class="t">答對題數</div></div>
+      <div class="sbox"><div class="n" id="rStreak">0</div><div class="t">最高連勝</div></div>
+      <div class="sbox"><div class="n" id="rAvg">-s</div><div class="t">平均答題</div></div>
+    </div>
+    <div class="bdown"><h4>各類型成績</h4><div id="brows"></div></div>
+    <button class="btn primary" style="margin-top:12px;max-width:200px;margin-left:auto;margin-right:auto;display:block" onclick="resetGame()">🎮 再挑戰一次</button>
+  </div>
+</div>
+<script>
+const ri=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const rf=a=>a[ri(0,a.length-1)];
+const sh=a=>[...a].sort(()=>Math.random()-.5);
+let diff='easy',mode='mix',score=0,streak=0,maxStreak=0,correct_=0;
+let qi=0,answered=false,running=false,timer=null,timeLeft=60;
+let results=[],times=[],typeLog={},curQ=null;
+const TOTAL=20,T=60;
+function setDiff(d,el){diff=d;document.querySelectorAll('.db').forEach(b=>b.classList.remove('on'));el.classList.add('on');if(running)resetGame();}
+function setType(t,el){mode=t;document.querySelectorAll('.tt').forEach(b=>b.classList.remove('on'));el.classList.add('on');if(running)resetGame();}
+
+// ── MATH ────────────────────────────────────────
+function seq(arr,ans){return{kind:'seq',seq:[...arr,'?'],ans,hint:'',typeKey:'math'};}
+const MG={
+easy:[
+  // ── 基本等差 ──
+  ()=>{const s=ri(2,30),d=ri(2,9);const a=[s,s+d,s+2*d,s+3*d,s+4*d];return seq(a.slice(0,4),a[4]);},
+  ()=>{const s=ri(40,150),d=ri(3,15);const a=[s,s-d,s-2*d,s-3*d,s-4*d];return seq(a.slice(0,4),a[4]);},
+  ()=>{const s=ri(5,50),d=ri(10,25);const a=[s,s+d,s+2*d,s+3*d,s+4*d];return seq(a.slice(0,4),a[4]);},
+  // ── 等比 ──
+  ()=>{const s=ri(2,12);return seq([s,s*2,s*4,s*8],s*16);},
+  ()=>{const s=ri(1,6);return seq([s,s*3,s*9,s*27],s*81);},
+  ()=>{const s=ri(1,4),m=ri(2,3);return seq([s,s*m,s*m**2,s*m**3],s*m**4);},
+  // ── 奇偶數列 ──
+  ()=>{const s=ri(1,10)*2-1;return seq([s,s+2,s+4,s+6],s+8);},
+  ()=>{const s=ri(1,10)*2;return seq([s,s+2,s+4,s+6],s+8);},
+  // ── 5/10的倍數 ──
+  ()=>{const s=ri(1,8)*5;return seq([s,s+5,s+10,s+15],s+20);},
+  ()=>{const s=ri(1,5)*10;return seq([s,s+10,s+20,s+30],s+40);},
+  // ── 前兩項之和 ──
+  ()=>{const a=ri(1,8),b=ri(1,8);const arr=[a,b,a+b,a+2*b,a+3*b];return seq(arr.slice(0,4),arr[4]);},
+  ()=>{const a=ri(2,6),b=ri(2,6);const arr=[a,b,a+b,b+(a+b),a+b+b+(a+b)];return seq(arr.slice(0,4),arr[4]);},
+  // ── 交替加 ──
+  ()=>{const s=ri(2,20),a=ri(2,6),b=ri(3,9);const arr=[s,s+a,s+a+b,s+2*a+b,s+2*a+2*b];return seq(arr.slice(0,4),arr[4]);},
+  ()=>{const s=ri(5,30),a=ri(3,8),b=ri(2,6);const arr=[s,s+a,s+a-b,s+2*a-b,s+2*a-2*b];return seq(arr.slice(0,4),arr[4]);},
+  // ── 三角形數 ──
+  ()=>{const off=ri(0,4);const tri=n=>n*(n+1)/2;const a=[1,2,3,4,5].map(n=>tri(n+off));return seq(a.slice(0,4),a[4]);},
+  // ── 每次乘2再加1 ──
+  ()=>{const s=ri(1,5);const arr=[s,s*2+1,(s*2+1)*2+1,((s*2+1)*2+1)*2+1];return seq(arr.slice(0,3),arr[3]);},
+  // ── 中間挖空 ──
+  ()=>{const s=ri(1,10),d=ri(3,8);const f=[s,s+d,s+2*d,s+3*d,s+4*d];const mi=ri(1,3);const d2=[...f];d2[mi]='?';return{kind:'seq',seq:d2,ans:f[mi],hint:'',typeKey:'math'};},
+  // ── 加固定步距（大數）──
+  ()=>{const s=ri(100,300),d=ri(10,30);const a=[s,s+d,s+2*d,s+3*d,s+4*d];return seq(a.slice(0,4),a[4]);},
+  // ── 每次減固定（大數）──
+  ()=>{const s=ri(200,500),d=ri(20,50);const a=[s,s-d,s-2*d,s-3*d,s-4*d];return seq(a.slice(0,4),a[4]);},
+  // ── 平方根感覺（完全平方數）──
+  ()=>{const s=ri(1,6);return seq([s**2,(s+1)**2,(s+2)**2,(s+3)**2],(s+4)**2);},
+],
+medium:[
+  // ── 費氏 ──
+  ()=>{const f=[ri(1,6),ri(1,6)];for(let i=2;i<7;i++)f.push(f[i-1]+f[i-2]);return seq(f.slice(0,5),f[5]);},
+  ()=>{const f=[ri(2,8),ri(1,5)];for(let i=2;i<7;i++)f.push(f[i-1]+f[i-2]);return seq(f.slice(0,5),f[5]);},
+  // ── 平方數列 ──
+  ()=>{const s=ri(1,8);const a=[s**2,(s+1)**2,(s+2)**2,(s+3)**2,(s+4)**2];return seq(a.slice(0,4),a[4]);},
+  ()=>{const s=ri(3,9);const a=[s**2,(s+1)**2,(s+2)**2,(s+3)**2,(s+4)**2];return seq(a.slice(0,4),a[4]);},
+  // ── 立方數列 ──
+  ()=>{const s=ri(1,5);const a=[s**3,(s+1)**3,(s+2)**3,(s+3)**3];return seq(a.slice(0,3),a[3]);},
+  // ── 等比 ──
+  ()=>{const s=ri(2,5),m=ri(2,4);const a=[s,s*m,s*m**2,s*m**3,s*m**4];return seq(a.slice(0,4),a[4]);},
+  // ── 兩組交替 ──
+  ()=>{const a=ri(2,10),b=ri(2,10),c=ri(2,6);const arr=[a,b,a+c,b+c,a+2*c,b+2*c];return seq(arr.slice(0,5),arr[5]);},
+  ()=>{const a=ri(2,8),b=ri(3,12),c=ri(3,8);const arr=[a,b,a+c,b+c,a+2*c,b+2*c];return seq(arr.slice(0,5),arr[5]);},
+  // ── 差值遞增 ──
+  ()=>{const s=ri(1,10);const arr=[s,s+2,s+5,s+9,s+14,s+20];return seq(arr.slice(0,5),arr[5]);},
+  ()=>{const s=ri(1,8);const arr=[s,s+1,s+3,s+6,s+10,s+15];return seq(arr.slice(0,5),arr[5]);},
+  // ── 每兩項相同再乘 ──
+  ()=>{const a=ri(2,8),d=ri(2,4);const arr=[a,a,a*d,a*d,a*d**2,a*d**2];return seq(arr.slice(0,5),arr[5]);},
+  // ── n*(n+2)型 ──
+  ()=>{const s=ri(1,6);const arr=[s*(s+2),(s+1)*(s+3),(s+2)*(s+4),(s+3)*(s+5),(s+4)*(s+6)];return seq(arr.slice(0,4),arr[4]);},
+  // ── 差值平方 ──
+  ()=>{const s=ri(1,6);const arr=[s,s+1,s+4,s+9,s+16,s+25];return seq(arr.slice(0,5),arr[5]);},
+  // ── 週期3循環 ──
+  ()=>{const a=ri(2,9),b=ri(2,9),c=ri(2,9);return seq([a,b,c,a,b,c],a);},
+  ()=>{const a=ri(2,9),b=ri(2,9),c=ri(2,9);const f=[a,b,c,a,b,c,a,b];return seq(f.slice(0,7),f[7]);},
+  // ── 正負交替 ──
+  ()=>{const a=ri(2,8),r=ri(2,3);const arr=[a,-a*r,a*r**2,-a*r**3,a*r**4];return seq(arr.slice(0,4),arr[4]);},
+  // ── 中間挖空（中等版）──
+  ()=>{const a=ri(1,8),d=ri(3,10);const f=[a,a+d,a+2*d,a+3*d,a+4*d];const mi=ri(1,3);const d2=[...f];d2[mi]='?';return{kind:'seq',seq:d2,ans:f[mi],hint:'',typeKey:'math'};},
+  // ── 每項加k×n ──
+  ()=>{const a=ri(2,8),k=ri(2,4);const arr=[a,a+k,a+k+2*k,a+k+2*k+3*k,a+k+2*k+3*k+4*k];return seq(arr.slice(0,4),arr[4]);},
+  // ── 雙倍差值 ──
+  ()=>{const s=ri(2,10),d=ri(3,7);const arr=[s,s+d,s+3*d,s+7*d,s+15*d];return seq(arr.slice(0,4),arr[4]);},
+  // ── 加法後乘 ──
+  ()=>{const a=ri(1,4),b=ri(1,4);const arr=[a,a+b,2*(a+b),(a+b)+2*(a+b),3*2*(a+b)];return seq(arr.slice(0,4),arr[4]);},
+],
+hard:[
+  // ── 二階等差 ──
+  ()=>{const s=ri(2,10),d0=ri(2,5),step=1;const arr=[s];let d=d0;for(let i=0;i<5;i++){arr.push(arr[arr.length-1]+d);d+=step;}return seq(arr.slice(0,5),arr[5]);},
+  ()=>{const s=ri(2,10),d0=ri(2,5),step=2;const arr=[s];let d=d0;for(let i=0;i<5;i++){arr.push(arr[arr.length-1]+d);d+=step;}return seq(arr.slice(0,5),arr[5]);},
+  // ── 兩條等差交錯 ──
+  ()=>{const a=ri(1,8),b=ri(1,8),da=ri(2,6),db=ri(3,7);const arr=[a,b,a+da,b+db,a+2*da,b+2*db,a+3*da];return seq(arr.slice(0,6),arr[6]);},
+  ()=>{const a=ri(2,9),b=ri(2,9),da=ri(3,8),db=ri(2,6);const arr=[a,b,a+da,b+db,a+2*da,b+2*db,a+3*da];return seq(arr.slice(0,6),arr[6]);},
+  // ── 差值加倍 ──
+  ()=>{const s=ri(1,8);const arr=[s,s+1,s+3,s+7,s+15,s+31];return seq(arr.slice(0,5),arr[5]);},
+  ()=>{const s=ri(1,5);const arr=[s,s+1,s+3,s+7,s+15,s+31,s+63];return seq(arr.slice(0,6),arr[6]);},
+  // ── 次方數列 ──
+  ()=>{const b=ri(2,6);const a=[b,b**2,b**3,b**4,b**5];return seq(a.slice(0,4),a[4]);},
+  ()=>{const b=ri(2,4);const a=[b**2,b**3,b**4,b**5,b**6];return seq(a.slice(0,4),a[4]);},
+  // ── 加法三角 ──
+  ()=>{const dd=ri(1,4);const arr=[1,1+dd,1+3*dd,1+6*dd,1+10*dd,1+15*dd];return seq(arr.slice(0,5),arr[5]);},
+  ()=>{const dd=ri(2,5);const arr=[dd,3*dd,6*dd,10*dd,15*dd,21*dd];return seq(arr.slice(0,5),arr[5]);},
+  // ── 平方+常數 ──
+  ()=>{const c=ri(1,10);const arr=[1+c,4+c,9+c,16+c,25+c,36+c];return seq(arr.slice(0,5),arr[5]);},
+  ()=>{const c=ri(2,8);const arr=[c-1,c+3,c+11,c+23,c+39,c+59];return seq(arr.slice(0,5),arr[5]);},
+  // ── n(n+1)型 ──
+  ()=>{const s=ri(1,6);const arr=[s*(s+1),(s+1)*(s+2),(s+2)*(s+3),(s+3)*(s+4),(s+4)*(s+5)];return seq(arr.slice(0,4),arr[4]);},
+  ()=>{const s=ri(1,5);const arr=[s*(s+2),(s+1)*(s+3),(s+2)*(s+4),(s+3)*(s+5),(s+4)*(s+6)];return seq(arr.slice(0,4),arr[4]);},
+  // ── 費氏（大）──
+  ()=>{const f=[ri(3,10),ri(3,10)];for(let i=2;i<7;i++)f.push(f[i-1]+f[i-2]);return seq(f.slice(0,5),f[5]);},
+  ()=>{const f=[ri(5,15),ri(3,8)];for(let i=2;i<7;i++)f.push(f[i-1]+f[i-2]);return seq(f.slice(0,5),f[5]);},
+  // ── 交替加減 ──
+  ()=>{const s=ri(5,20),a=ri(3,9),b=ri(3,9);const arr=[s,s+a,s+a-b,s+2*a-b,s+2*a-2*b,s+3*a-2*b];return seq(arr.slice(0,5),arr[5]);},
+  ()=>{const s=ri(10,30),a=ri(4,10),b=ri(2,7);const arr=[s,s-a,s-a+b,s-2*a+b,s-2*a+2*b,s-3*a+2*b];return seq(arr.slice(0,5),arr[5]);},
+  // ── 2ⁿ+常數 ──
+  ()=>{const c=ri(1,10);const arr=[1+c,2+c,4+c,8+c,16+c,32+c];return seq(arr.slice(0,5),arr[5]);},
+  ()=>{const c=ri(1,5),m=ri(2,3);const arr=[m+c,m**2+c,m**3+c,m**4+c,m**5+c];return seq(arr.slice(0,4),arr[4]);},
+  // ── 分組加法 ──
+  ()=>{const a=ri(2,8),b=ri(2,8),c=ri(2,8),d=ri(2,8);const arr=[a,b,a+b,c,d,c+d];return seq(arr.slice(0,5),arr[5]);},
+  // ── 奇數平方 ──
+  ()=>{const s=ri(0,3);const odds=[1,3,5,7,9,11];return seq(odds.slice(s,s+4).map(n=>n**2),(odds[s+4])**2);},
+  // ── 前項乘以積差 ──
+  ()=>{const a=ri(2,4),b=ri(2,4);const arr=[a,b,a*b,b*(a*b),(a*b)*(b*(a*b))];return seq(arr.slice(0,4),arr[4]);},
+  // ── 中間挖空（困難）──
+  ()=>{const a=ri(2,10),d=ri(4,12);const f=[a,a+d,a+2*d,a+3*d,a+4*d,a+5*d];const mi=ri(2,4);const disp=[...f.slice(0,6)];disp[mi]='?';return{kind:'seq',seq:disp.slice(0,6),ans:f[mi],hint:'',typeKey:'math'};},
+],
+hell:[
+  // ── 三階等差 ──
+  ()=>{const s=ri(1,5),a=ri(1,3),b=ri(1,2);const arr=[s];let d=a,dd=b;for(let i=0;i<6;i++){arr.push(arr[arr.length-1]+d);d+=dd;dd+=1;}return seq(arr.slice(0,6),arr[6]);},
+  ()=>{const s=ri(2,8),d1=ri(2,5),d2=ri(1,3);const arr=[s];let cur=s,di=d1;for(let i=0;i<6;i++){cur+=di;arr.push(cur);di+=d2;}return seq(arr.slice(0,6),arr[6]);},
+  // ── 盧卡斯 ──
+  ()=>{const L=[2,1];for(let i=2;i<8;i++)L.push(L[i-1]+L[i-2]);return seq(L.slice(0,5),L[5]);},
+  ()=>{const L=[ri(2,4),ri(1,3)];for(let i=2;i<8;i++)L.push(L[i-1]+L[i-2]);return seq(L.slice(0,5),L[5]);},
+  // ── 三項遞推 ──
+  ()=>{const f=[ri(1,3),ri(1,4),ri(1,3)];for(let i=3;i<7;i++)f.push(f[i-1]+f[i-2]+f[i-3]);return seq(f.slice(0,5),f[5]);},
+  ()=>{const f=[ri(1,2),ri(1,3),ri(1,2)];for(let i=3;i<7;i++)f.push(f[i-1]+f[i-2]+f[i-3]);return seq(f.slice(0,6),f[6]);},
+
+  // ── 複雜交叉遞推 ──
+  ()=>{const a=ri(1,4),b=ri(1,4),k=ri(2,3);const arr=[a,b,a*k+b,b*k+a*k+b,(a*k+b)*k+b*k+a*k+b];return seq(arr.slice(0,4),arr[4]);},
+  ()=>{const a=ri(1,3),b=ri(2,5);const arr=[a,b,a+b,a*b,a+b+a*b,a*b*(a+b)];return seq(arr.slice(0,5),arr[5]);},
+  // ── 費氏+n ──
+  ()=>{const a2=[ri(1,5),ri(1,5)];for(let i=2;i<7;i++)a2.push(a2[i-1]+a2[i-2]+i);return seq(a2.slice(0,5),a2[5]);},
+  ()=>{const a2=[ri(2,6),ri(1,4)];for(let i=2;i<7;i++)a2.push(a2[i-1]+a2[i-2]+(i+1));return seq(a2.slice(0,5),a2[5]);},
+  // ── n²+n型 ──
+  ()=>{const off=ri(0,4);const arr=[1,2,3,4,5,6].map(n=>(n+off)**2+(n+off));return seq(arr.slice(0,5),arr[5]);},
+  ()=>{const off=ri(0,3);const arr=[1,2,3,4,5,6].map(n=>(n+off)**2-(n+off));return seq(arr.slice(0,5),arr[5]);},
+  // ── 前項²-k ──
+  ()=>{const k=ri(1,3),s=ri(2,3);const arr=[s];for(let i=0;i<4;i++)arr.push(arr[arr.length-1]**2-k);return seq(arr.slice(0,4),arr[4]);},
+  // ── 雙週期交織 ──
+  ()=>{const a=ri(2,8),da=ri(2,5),b=ri(2,4),r=ri(2,3);const arr=[a,b,a+da,b*r,a+2*da,b*r**2,a+3*da];return seq(arr.slice(0,6),arr[6]);},
+  ()=>{const a=ri(3,9),da=ri(3,6),b=ri(2,3),r=2;const arr=[a,b,a+da,b*r,a+2*da,b*r**2,a+3*da];return seq(arr.slice(0,6),arr[6]);},
+  // ── 積差遞推 ──
+  ()=>{const a=ri(2,4),b=ri(3,6),r=ri(2,3);const arr=[a,b,b*r-a,b*r**2-b-a,(b*r**2-b-a)*r-(b*r-a)];return seq(arr.slice(0,4),arr[4]);},
+  // ── 自乘mod ──
+  ()=>{const a=ri(2,4),b=ri(2,4);const arr=[a,b,(a*b)%97,((a*b)%97*b)%97];const n4=((a*b)%97*b%97*(a*b)%97)%97;return seq(arr.slice(0,4),n4);},
+  // ── 中間多挖（地獄）──
+  ()=>{const a=ri(3,12),d=ri(5,15);const f=[a,a+d,a+2*d,a+3*d,a+4*d,a+5*d,a+6*d];const mi=ri(2,5);const disp=[...f.slice(0,7)];disp[mi]='?';return{kind:'seq',seq:disp.slice(0,7),ans:f[mi],hint:'',typeKey:'math'};},
+  // ── 等差×等比 ──
+  ()=>{const a=ri(1,4),d=ri(1,3),r=ri(2,3);const arr=[a*1,(a+d)*r,(a+2*d)*r**2,(a+3*d)*r**3];return seq(arr.slice(0,3),arr[3]);},
+],
+};
+
+// ── CALC ────────────────────────────────────────
+function mkCalc(expr,ans){return{kind:'calc',expr,ans,hint:'',typeKey:'calc'};}
+const CG={
+easy:[
+  ()=>{const a=ri(15,85),b=ri(10,55);return mkCalc(`${a} + ${b} = ?`,a+b);},
+  ()=>{const b=ri(5,45),a=ri(b+5,95);return mkCalc(`${a} − ${b} = ?`,a-b);},
+  ()=>{const a=ri(3,12),b=ri(3,12);return mkCalc(`${a} × ${b} = ?`,a*b);},
+  ()=>{const b=ri(2,9),a=ri(2,12);return mkCalc(`${b*a} ÷ ${b} = ?`,a);},
+  ()=>{const a=ri(10,50),b=ri(10,50);return mkCalc(`${a} + ${b} = ?`,a+b);},
+  ()=>{const a=ri(5,9),b=ri(5,9);return mkCalc(`${a} × ${b} = ?`,a*b);},
+],
+medium:[
+  ()=>{const a=ri(25,150),b=ri(25,120);return mkCalc(`${a} + ${b} = ?`,a+b);},
+  ()=>{const a=ri(5,15),b=ri(5,15),c=ri(3,25);return mkCalc(`${a} × ${b} + ${c} = ?`,a*b+c);},
+  ()=>{const a=ri(5,15),b=ri(5,15),c=ri(3,15);return mkCalc(`${a} × ${b} − ${c} = ?`,a*b-c);},
+  ()=>{const a=ri(10,45),b=ri(5,20),c=ri(2,12);return mkCalc(`${a} + ${b} × ${c} = ?`,a+b*c);},
+  ()=>{const b=ri(2,9),a=ri(3,15),e=ri(5,35);return mkCalc(`${b*a} ÷ ${b} + ${e} = ?`,a+e);},
+  ()=>{const a=ri(10,50),b=ri(5,30),c=ri(2,8);return mkCalc(`${a} − ${b} + ${c} = ?`,a-b+c);},
+],
+hard:[
+  ()=>{const a=ri(10,30),b=ri(5,20),c=ri(3,12);return mkCalc(`(${a} + ${b}) × ${c} = ?`,(a+b)*c);},
+  ()=>{const a=ri(5,15),b=ri(3,9),c=ri(2,6),d=ri(10,30);return mkCalc(`${a} × ${b} − ${c} × ${d} = ?`,a*b-c*d);},
+  ()=>{const b=ri(2,6);return mkCalc(`${b}³ = ?`,b**3);},
+  ()=>{const a=ri(3,9),b=ri(3,9),c=ri(2,6);return mkCalc(`(${a} + ${b}) × ${c} − ${c} = ?`,(a+b)*c-c);},
+  ()=>{const a=ri(4,9),b=ri(3,8);return mkCalc(`${a}² + ${b}² = ?`,a**2+b**2);},
+  ()=>{const a=ri(3,8),b=ri(3,8);return mkCalc(`${a} × ${b} + ${a} = ?`,a*b+a);},
+],
+hell:[
+  ()=>{const a=ri(8,15),b=ri(6,12),c=ri(4,9),d=ri(2,5),e=ri(5,20);return mkCalc(`${a}×${b} − ${c}×${d} + ${e} = ?`,a*b-c*d+e);},
+  ()=>{const a=ri(3,8),b=ri(2,5),c=ri(10,40);return mkCalc(`${a}² × ${b} + ${c} = ?`,a**2*b+c);},
+  ()=>{const a=ri(4,10),b=ri(3,8),c=ri(2,6),d=ri(3,8);return mkCalc(`(${a}+${b})×(${c}+${d}) = ?`,(a+b)*(c+d));},
+  ()=>{const a=ri(3,7),b=ri(2,5),c=ri(2,5);return mkCalc(`${a}²×${b} − ${c}² = ?`,a**2*b-c**2);},
+  ()=>{const a=ri(2,6),b=ri(2,6);return mkCalc(`(${a}+${b})² = ?`,(a+b)**2);},
+  ()=>{const a=ri(2,5),b=ri(3,7);return mkCalc(`${a}³ + ${b}² = ?`,a**3+b**2);},
+]};
+
+// ── SHAPE ───────────────────────────────────────
+const ES=[['🔴','🟡','🔵','🟢','🟣','🟠','⚫','🟤'],['🐱','🐶','🐸','🐼','🦊','🐯','🐨','🦁'],['🍎','🍋','🍇','🍊','🍓','🍑','🍒','🥝'],['🍕','🍔','🌮','🍜','🍣','🍩','🎂','🍦'],['⭐','🌙','☀️','🌈','⚡','🌊','🔥','❄️']];
+function shape(arr,ans,eset){
+  // eset = 整個 emoji set，用來補充干擾選項
+  const as=String(ans);
+  // 先從序列裡找不同的元素
+  const inS=[...new Set(arr.map(String).filter(s=>s!==as))];
+  let pool=sh(inS);
+  // 不夠的話從同一個 emoji set 補（絕不用幾何名詞）
+  if(pool.length<3 && eset){
+    const extra=sh(eset.map(String).filter(e=>e!==as&&!inS.includes(e)));
+    pool=[...pool,...extra];
+  }
+  // 還不夠就從所有 ES 裡補
+  if(pool.length<3){
+    const allEmoji=[].concat(...ES).map(String).filter(e=>e!==as&&!pool.includes(e));
+    pool=[...pool,...sh(allEmoji)];
+  }
+  const c=sh([as,...pool.slice(0,3)]);
+  return{kind:'shape',seq:[...arr,'?'],ans:as,hint:'',typeKey:'shape',choices:c};
+}
+const SHG={
+easy:[
+  ()=>{const[a,b]=sh(_es=rf(ES));return shape([a,b,a,b,a],b,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,a,b],c,_es);},
+  ()=>{const[a,b]=sh(_es=rf(ES));return shape([b,a,b,a,b],a,_es);},
+  ()=>{const[a,b]=sh(_es=rf(ES));return shape([a,b,a,b,a,b],a,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([b,c,a,b,c],a,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,c,a,b],c,_es);},
+  ()=>{const[a,b]=sh(_es=rf(ES));return shape([a,a,b,a,a,b],a,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,b,c,a,b,b],c,_es);},
+  ()=>{const[a,b]=sh(_es=rf(ES));return shape([a,b,b,a,b,b],a,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([c,a,b,c,a],b,_es);},
+  ()=>{const[a,b]=sh(_es=rf(ES));return shape([a,b,a,a,b,a],a,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,a,b,b,c,c,a,a,b],b,_es);},
+],
+medium:[
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,a,b,b,c],c,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,a,b,c],a,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,c,d,a,b,c],d,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,b,a,b],c,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,a,b,c,b],a,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,c,b,a,a,b],c,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,c,d,d,c,b,a,a],b,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,a,c,b,a,b],c,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,a,a,b,b,b,c],c,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,a,c,a,d],a,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,b,c,c,c,a,a],a,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,c,d,c,b,a,b],c,_es);},
+],
+hard:[
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,b,c,c,c,d,d],d,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,a,c,b,a],b,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,a,a,b,b,b,c,c],c,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,a,c,a,b,a,c],a,_es);},
+  ()=>{const[a,b]=sh(_es=rf(ES));return shape([a,b,a,b,b,a,b,b,b,a],a,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,c,d,a,c,b,d,a],b,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,b,c,a,c,a,b],a,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,b,c,c,c,d,d,d,d,a,a],a,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,b,a,c,c,a,b,b],a,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([d,c,b,a,d,c,b,a,d,c],b,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,a,b,a,a,a,b,a,a,a,a,b,a,a,a,a,a],b,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,a,b,c,b,c,a,b],c,_es);},
+],
+hell:[
+  ()=>{const[a,b]=sh(_es=rf(ES));return shape([a,b,a,b,b,a,b,b,b],a,_es);},
+  ()=>{const[a,b,c,d,e]=sh(_es=rf(ES));return shape([a,b,a,c,a,d,a,e,a],a,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,b,c,c,c,d,d,d],d,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,c,d,b,c,d,a,b,c],d,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,c,b,a,b,c,b,a,b,c],b,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,b,a,c,c,a,d,d,a,b,b,a],c,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,b,b,b,c,c,c,c,a,a,a,a,a,b],b,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,c,a,c,b,d,a,b,c,a,c],b,_es);},
+  ()=>{const[a,b,c,d]=sh(_es=rf(ES));return shape([a,b,c,d,c,b,a,b,c,d,c],b,_es);},
+  ()=>{const[a,b,c]=sh(_es=rf(ES));return shape([a,a,b,a,a,a,b,b,a,a,a,a,b,b,b,a],a,_es);},
+]};
+
+// ── MISSING ─────────────────────────────────────
+function mkM(expr,ans){return{kind:'calc',expr,ans,hint:'',typeKey:'missing'};}
+const MISG={
+easy:[
+  ()=>{const b=ri(5,35),a=ri(5,35);return mkM(`${a+b} − ? = ${b}`,a);},
+  ()=>{const a=ri(2,9),b=ri(2,12);return mkM(`? × ${a} = ${a*b}`,b);},
+  ()=>{const b=ri(2,9),a=ri(2,12);return mkM(`${a*b} ÷ ? = ${a}`,b);},
+  ()=>{const a=ri(5,35),b=ri(5,35);return mkM(`? + ${a} = ${a+b}`,b);},
+  ()=>{const a=ri(10,50),b=ri(5,30);return mkM(`${a+b} − ${b} = ?`,a);},
+],
+medium:[
+  ()=>{const a=ri(3,9),b=ri(3,9),c=ri(3,20);return mkM(`${a} × ? + ${c} = ${a*b+c}`,b);},
+  ()=>{const a=ri(10,60),b=ri(5,35),c=ri(2,12);return mkM(`${a} + ? − ${c} = ${a+b-c}`,b);},
+  ()=>{const k=ri(2,8);return mkM(`?² = ${k**2}`,k);},
+  ()=>{const a=ri(3,9),b=ri(2,8),c=ri(2,8);return mkM(`${a} × ? − ${c} = ${a*b-c}`,b);},
+  ()=>{const a=ri(2,8),b=ri(3,9);return mkM(`? ÷ ${a} = ${b}`,a*b);},
+],
+hard:[
+  ()=>{const a=ri(3,9),b=ri(2,6),c=ri(2,8);return mkM(`(? + ${c}) × ${a} = ${(b+c)*a}`,b);},
+  ()=>{const k=ri(3,9),sub=ri(1,8);return mkM(`?² − ${sub} = ${k**2-sub}`,k);},
+  ()=>{const a=ri(2,8),b=ri(3,9),c=ri(2,8);return mkM(`${a} × ${b} = ? + ${c}`,a*b-c);},
+  ()=>{const b=ri(2,8),k=ri(2,8),e=ri(3,10);return mkM(`? ÷ ${b} + ${e} = ${k+e}`,k*b);},
+  ()=>{const a=ri(2,6),k=ri(3,9);return mkM(`${a} × ? = ${a*k}`,k);},
+],
+hell:[
+  ()=>{const a=ri(2,7),c=ri(3,9);return mkM(`(? + ${c})² = ${(a+c)**2}`,a);},
+  ()=>{const a=ri(2,6),b=ri(2,5),c=ri(2,5);return mkM(`${a} × ? × ${c} = ${a*b*c}`,b);},
+  ()=>{const k=ri(2,5);return mkM(`?³ = ${k**3}`,k);},
+  ()=>{const a=ri(2,6),b=ri(2,5);return mkM(`(? − ${b})² = ${a**2}`,a+b);},
+  ()=>{const a=ri(3,7),b=ri(2,5);return mkM(`?² × ${b} = ${a**2*b}`,a);},
+]};
+
+// ── SPATIAL (IQ矩陣) ────────────────────────────
+const SV=70;
+function svgCirc(cx,cy,r,f='#818cf8'){return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${f}"/>`;}
+function svgRect(x,y,w,h,f='#818cf8'){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${f}"/>`;}
+function svgTriUp(cx,cy,r,f='#818cf8'){return `<polygon points="${cx},${cy-r} ${cx-r*.87},${cy+r*.5} ${cx+r*.87},${cy+r*.5}" fill="${f}"/>`;}
+function svgDiamond(cx,cy,r,f='#818cf8'){return `<polygon points="${cx},${cy-r} ${cx+r},${cy} ${cx},${cy+r} ${cx-r},${cy}" fill="${f}"/>`;}
+function svgStar5(cx,cy,R,r,f='#818cf8'){let p='';for(let i=0;i<10;i++){const a=i*Math.PI/5-Math.PI/2,rad=i%2?r:R;p+=`${cx+rad*Math.cos(a)},${cy+rad*Math.sin(a)} `;}return `<polygon points="${p.trim()}" fill="${f}"/>`;}
+function svgGrid(n,f='#818cf8'){const step=SV/n;let s='';for(let i=1;i<n;i++){s+=`<line x1="${i*step}" y1="0" x2="${i*step}" y2="${SV}" stroke="${f}" stroke-width="1"/>`;s+=`<line x1="0" y1="${i*step}" x2="${SV}" y2="${i*step}" stroke="${f}" stroke-width="1"/>`;}return s;}
+function m3x3(cells){const GS=SV+4,W=GS*3+4,H=GS*3+4;let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#0f0c29" rx="6"/>`;cells.forEach((c,i)=>{const col=i%3,row=Math.floor(i/3),x=2+col*GS,y=2+row*GS;s+=`<g transform="translate(${x},${y})">${c}</g><rect x="${x}" y="${y}" width="${SV}" height="${SV}" fill="none" stroke="#2a2560" stroke-width="1.5"/>`;});return s+'</svg>';}
+function mOC(c){return `<svg viewBox="0 0 ${SV+8} ${SV+8}" xmlns="http://www.w3.org/2000/svg" width="${SV+8}" height="${SV+8}"><rect width="${SV+8}" height="${SV+8}" fill="#12102a" rx="6"/><g transform="translate(4,4)">${c}</g></svg>`;}
+function qCell(){return `<rect width="${SV}" height="${SV}" fill="#1a1840" rx="3"/><text x="${SV/2}" y="${SV/2}" fill="#818cf8" font-size="28" font-family="Nunito" text-anchor="middle" dominant-baseline="middle" font-weight="900">?</text>`;}
+function mOpts(correct,wrongs){const letters=['A','B','C','D'];const all=sh([{svg:mOC(correct),isAns:true},...sh(wrongs).slice(0,3).map(w=>({svg:mOC(w),isAns:false}))]);all.forEach((o,i)=>o.label=letters[i]);return{choices:all.map(o=>({svg:o.svg,label:o.label})),ans:all.find(o=>o.isAns).label};}
+function mkVis(svgQ,correct,wrongs){const{choices,ans}=mOpts(correct,wrongs);return{kind:'visual',svgQ,choices,ans,typeKey:'spatial'};}
+
+function gSize(){
+  const c=SV/2;
+  const shapes=sh([(r,f)=>svgCirc(c,c,r,f),(r,f)=>svgRect(c-r,c-r,r*2,r*2,f),(r,f)=>svgTriUp(c,c,r,f),(r,f)=>svgDiamond(c,c,r,f),(r,f)=>svgStar5(c,c,r,r*.4,f)]);
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24','#22d3ee','#4ade80']);
+  const sizes=[26,18,10];
+  function cell(si,fi){return `<rect width="${SV}" height="${SV}" fill="#1a1840" rx="3"/>${shapes[si](sizes[fi],fills[si])}`;}
+  const cells=[];for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  return mkVis(m3x3(cells),cell(2,2),[cell(2,0),cell(2,1),cell(1,2)]);
+}
+function gCount(){
+  const c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  const pos=[[[c,c]],[[c-12,c],[c+12,c]],[[c,c-12],[c-12,c+8],[c+12,c+8]],[[c-12,c-12],[c+12,c-12],[c-12,c+12],[c+12,c+12]],[[c,c-16],[c-16,c-4],[c+16,c-4],[c-10,c+14],[c+10,c+14]],[[c-16,c-12],[c,c-12],[c+16,c-12],[c-16,c+12],[c,c+12],[c+16,c+12]]];
+  function cell(n,f){const pts=pos[Math.min(n-1,pos.length-1)];return `<rect width="${SV}" height="${SV}" fill="#1a1840" rx="3"/>${pts.map(([px,py])=>svgCirc(px,py,7,f)).join('')}`;}
+  const base=ri(1,2);const counts=[[base,base+1,base+2],[base+1,base+2,base+3],[base+2,base+3,base+4]];
+  const cells=[];for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(counts[r][c2],fills[r]));
+  const an=counts[2][2];
+  return mkVis(m3x3(cells),cell(an,fills[2]),[cell(an-1,fills[2]),cell(an+1,fills[2]),cell(an,fills[0])]);
+}
+function gFill(){
+  const c=SV/2,r=24,stroke='#818cf8';
+  const shapePool=sh([(f,s)=>svgCirc(c,c,r,f),(f,s)=>`<polygon points="${c},${c-r} ${c+r*.87},${c+r*.5} ${c-r*.87},${c+r*.5}" fill="${f}" stroke="${s}" stroke-width="2"/>`,(f,s)=>svgRect(c-r,c-r,r*2,r*2,f)]);
+  const colFills=['none','#818cf880','#818cf8'];
+  function cellS(fn,fc){return `<rect width="${SV}" height="${SV}" fill="#1a1840" rx="3"/>${fn(fc,stroke)}`;}
+  const cells=[];for(let row=0;row<3;row++)for(let col=0;col<3;col++)cells.push(row===2&&col===2?qCell():cellS(shapePool[row%shapePool.length],colFills[col]));
+  const correct=cellS(shapePool[2%shapePool.length],colFills[2]);
+  return mkVis(m3x3(cells),correct,[cellS(shapePool[2%shapePool.length],colFills[0]),cellS(shapePool[2%shapePool.length],colFills[1]),cellS(shapePool[0],colFills[2])]);
+}
+function gConcentric(){
+  const c=SV/2;
+  const sd=[(layers,fill)=>{let s='';for(let i=layers;i>=1;i--){const r=(c-4)*i/layers;s+=`<circle cx="${c}" cy="${c}" r="${r}" fill="${i===layers?fill:'#1a1840'}" stroke="${fill}" stroke-width="2"/>`;}return s;},(layers,fill)=>{let s='';for(let i=layers;i>=1;i--){const r=(c-4)*i/layers;s+=`<rect x="${c-r}" y="${c-r}" width="${r*2}" height="${r*2}" fill="${i===layers?fill:'#1a1840'}" stroke="${fill}" stroke-width="2" rx="2"/>`;}return s;},(layers,fill)=>{let s='';for(let i=layers;i>=1;i--){const r=(c-4)*i/layers;s+=`<polygon points="${c},${c-r} ${c+r},${c} ${c},${c+r} ${c-r},${c}" fill="${i===layers?fill:'#1a1840'}" stroke="${fill}" stroke-width="2"/>`;}return s;}];
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  function cell(si,layers){return `<rect width="${SV}" height="${SV}" fill="#1a1840" rx="3"/>${sd[si](layers,fills[si])}`;}
+  const cells=[];for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2+1));
+  return mkVis(m3x3(cells),cell(2,3),[cell(2,1),cell(2,2),cell(0,3)]);
+}
+function gMove(){
+  const SZ=SV/3,startIdx=ri(0,2);
+  function cell(posIdx){const row=Math.floor(posIdx/3),col=posIdx%3,x=col*SZ,y=row*SZ;return `<rect width="${SV}" height="${SV}" fill="#1a1840" rx="3"/>${svgGrid(3,'#2a2560')}<rect x="${x+2}" y="${y+2}" width="${SZ-4}" height="${SZ-4}" fill="#818cf8" rx="2"/>`;}
+  const positions=[...Array(9)].map((_,i)=>(startIdx+i)%9);
+  const cells=[...Array(8)].map((_,i)=>cell(positions[i]));cells.push(qCell());
+  const ap=positions[8];
+  return mkVis(m3x3(cells),cell(ap),[cell((ap+1)%9),cell((ap+2)%9),cell((ap-1+9)%9)]);
+}
+function gAdd(){
+  const c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  const dp=[[[c,c]],[[c-10,c],[c+10,c]],[[c,c-12],[c-10,c+6],[c+10,c+6]],[[c-10,c-10],[c+10,c-10],[c-10,c+10],[c+10,c+10]],[[c,c-14],[c-12,c-4],[c+12,c-4],[c-8,c+10],[c+8,c+10]],[[c-14,c-10],[c,c-10],[c+14,c-10],[c-14,c+10],[c,c+10],[c+14,c+10]]];
+  function cell(n,f){const p2=dp[Math.min(n-1,dp.length-1)];return `<rect width="${SV}" height="${SV}" fill="#1a1840" rx="3"/>${p2.map(([px,py])=>svgCirc(px,py,6,f)).join('')}`;}
+  const vals=[[ri(1,3),ri(1,2),ri(1,2)],[ri(1,2),ri(1,2),ri(1,2)]];vals.push([vals[0][0]+vals[1][0],vals[0][1]+vals[1][1],vals[0][2]+vals[1][2]]);
+  const cells=[];for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(vals[r][c2],fills[r]));
+  const an=vals[2][2];
+  return mkVis(m3x3(cells),cell(an,fills[2]),[cell(Math.max(1,an-1),fills[2]),cell(an+1,fills[2]),cell(an,fills[0])]);
+}
+function gMirror(){
+  const c=SV/2,S=SV,rowFills=['#818cf8','#f43f5e','#fbbf24'];
+  const bShapes=[
+    ()=>`<polygon points="${c-18},${c-22} ${c-4},${c-22} ${c-4},${c+8} ${c+18},${c+8} ${c+18},${c+22} ${c-18},${c+22}" fill="FILL"/>`,
+    ()=>`<polygon points="${c-18},${c-22} ${c+4},${c-22} ${c+4},${c-6} ${c+18},${c-6} ${c+18},${c+22} ${c-4},${c+22} ${c-4},${c+6} ${c-18},${c+6}" fill="FILL"/>`,
+    ()=>`<polygon points="${c-16},${c-22} ${c-2},${c-22} ${c-2},${c-4} ${c+18},${c-18} ${c+18},${c+4} ${c-2},${c+4} ${c-2},${c+22} ${c-16},${c+22}" fill="FILL"/>`,
+  ];
+  const si=ri(0,2);const base=bShapes[si];
+  function aF(svg,f){return svg.replace(/FILL/g,f);}
+  function orig(fi){return `<rect width="${S}" height="${S}" fill="#1a1840" rx="3"/>${aF(base(),rowFills[fi])}`;}
+  function mirLR(fi){return `<rect width="${S}" height="${S}" fill="#1a1840" rx="3"/><g transform="scale(-1,1) translate(-${S},0)">${aF(base(),rowFills[fi])}</g>`;}
+  function mirUD(fi){return `<rect width="${S}" height="${S}" fill="#1a1840" rx="3"/><g transform="scale(1,-1) translate(0,-${S})">${aF(base(),rowFills[fi])}</g>`;}
+  function mirBoth(fi){return `<rect width="${S}" height="${S}" fill="#1a1840" rx="3"/><g transform="scale(-1,-1) translate(-${S},-${S})">${aF(base(),rowFills[fi])}</g>`;}
+  const layout=[[orig,mirLR,mirUD],[mirLR,mirUD,mirBoth],[mirUD,mirBoth,null]];
+  const cells=[];for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():layout[r][c2](r));
+  return mkVis(m3x3(cells),orig(2),[mirLR(2),mirUD(2),mirBoth(2)]);
+}
+function gSubst(){
+  const c=SV/2,r=22;
+  const sNames=['circle','square','triangle','diamond','star'];
+  const[shA,shB,shC]=sh(sNames).slice(0,3);
+  const[fA,fB,fC]=sh(['#818cf8','#f43f5e','#fbbf24','#22d3ee','#4ade80']).slice(0,3);
+  function dS(name,fill,size=r){if(name==='circle')return svgCirc(c,c,size,fill);if(name==='square')return svgRect(c-size,c-size,size*2,size*2,fill);if(name==='triangle')return svgTriUp(c,c,size,fill);if(name==='diamond')return svgDiamond(c,c,size,fill);return svgStar5(c,c,size,size*.4,fill);}
+  function cell(name,fill,size=r){return `<rect width="${SV}" height="${SV}" fill="#1a1840" rx="3"/>${dS(name,fill,size)}`;}
+  const sizes=[r,r*.7,r*.45];
+  const rowShapes=[[shA,shB,shC],[shB,shC,shA],[shC,shA,shB]];
+  const rowFills=[fA,fB,fC];
+  const cells=[];for(let row=0;row<3;row++)for(let col=0;col<3;col++)cells.push(row===2&&col===2?qCell():cell(rowShapes[row][col],rowFills[row],sizes[row]));
+  const correct=cell(rowShapes[2][2],rowFills[2],sizes[2]);
+  return mkVis(m3x3(cells),correct,[cell(rowShapes[2][2],rowFills[0],sizes[2]),cell(rowShapes[0][0],rowFills[2],sizes[2]),cell(rowShapes[2][2],rowFills[2],sizes[0])]);
+}
+function gCube(){
+  // 6種面圖案（每個接受 cx,cy,size）
+  const PATS=[
+    (cx,cy,s)=>`<polygon points="${cx+s*.45},${cy} ${cx-s*.25},${cy-s*.42} ${cx-s*.25},${cy+s*.42}" fill="#e2e8f0"/>`,
+    (cx,cy,s)=>`<ellipse cx="${cx}" cy="${cy}" rx="${s*.42}" ry="${s*.3}" fill="none" stroke="#e2e8f0" stroke-width="3"/>`,
+    (cx,cy,s)=>[-1,0,1].map(i=>`<line x1="${cx+i*s*.28}" y1="${cy-s*.38}" x2="${cx+i*s*.28}" y2="${cy+s*.38}" stroke="#e2e8f0" stroke-width="3"/>`).join(''),
+    (cx,cy,s)=>[-1,0,1].map(i=>`<circle cx="${cx+i*s*.3}" cy="${cy}" r="${s*.11}" fill="#e2e8f0"/>`).join(''),
+    (cx,cy,s)=>`<polygon points="${cx},${cy-s*.44} ${cx+s*.44},${cy} ${cx},${cy+s*.44} ${cx-s*.44},${cy}" fill="none" stroke="#e2e8f0" stroke-width="3"/>`,
+    (cx,cy,s)=>`<rect x="${cx-s*.12}" y="${cy-s*.42}" width="${s*.24}" height="${s*.84}" fill="#e2e8f0"/><rect x="${cx-s*.42}" y="${cy-s*.12}" width="${s*.84}" height="${s*.24}" fill="#e2e8f0"/>`,
+  ];
+
+  // 隨機分配圖案：0=前 1=上 2=右 3=後 4=下 5=左
+  const assign=sh([0,1,2,3,4,5]);
+
+  // ── 展開圖（十字形）─────────────────────────────
+  const FS=48,G=3,GS=FS+G,NW=G+GS*4+G,NH=G+GS*3+G;
+  function nCell(col,row,fn){
+    const x=G+col*GS,y=G+row*GS,cx=x+FS/2,cy=y+FS/2;
+    return `<rect x="${x}" y="${y}" width="${FS}" height="${FS}" fill="#1e1b4b" stroke="#6366f1" stroke-width="2" rx="3"/>${PATS[assign[fn]](cx,cy,FS)}`;
+  }
+  const ni=`${nCell(1,0,1)}${nCell(0,1,5)}${nCell(1,1,0)}${nCell(2,1,2)}${nCell(3,1,3)}${nCell(1,2,4)}`;
+
+  // ── 選項：用「三面展示圖」代替3D立方體 ────────────
+  // 每個選項顯示3個標記的方格：上面/前面/右面
+  // 這樣圖案清楚大方，不會擠在一起
+  const OW=160,OH=110;
+  const F=44; // 每個面的大小
+
+  function makeOpt(topF, frontF, rightF){
+    const topX=F+4,topY=2;       // 上面（中央偏上）
+    const frontX=2,frontY=F+8;   // 前面（左下）
+    const rightX=F+8,rightY=F+8; // 右面（右下）
+    return `<svg viewBox="0 0 ${OW} ${OH}" xmlns="http://www.w3.org/2000/svg" width="${OW}" height="${OH}">
+      <rect width="${OW}" height="${OH}" fill="#12102a" rx="8"/>
+      <!-- 標示文字 -->
+      <text x="${topX+F/2}" y="${topY-3}" fill="#6366f1" font-size="9" font-family="Nunito" text-anchor="middle" font-weight="700">上</text>
+      <rect x="${topX}" y="${topY}" width="${F}" height="${F}" fill="#2d2b6b" stroke="#6366f1" stroke-width="1.5" rx="3"/>
+      ${PATS[assign[topF]](topX+F/2, topY+F/2, F)}
+      <text x="${frontX+F/2}" y="${frontY-3}" fill="#818cf8" font-size="9" font-family="Nunito" text-anchor="middle" font-weight="700">前</text>
+      <rect x="${frontX}" y="${frontY}" width="${F}" height="${F}" fill="#1e1c50" stroke="#818cf8" stroke-width="1.5" rx="3"/>
+      ${PATS[assign[frontF]](frontX+F/2, frontY+F/2, F)}
+      <text x="${rightX+F/2}" y="${rightY-3}" fill="#a78bfa" font-size="9" font-family="Nunito" text-anchor="middle" font-weight="700">右</text>
+      <rect x="${rightX}" y="${rightY}" width="${F}" height="${F}" fill="#1a1840" stroke="#a78bfa" stroke-width="1.5" rx="3"/>
+      ${PATS[assign[rightF]](rightX+F/2, rightY+F/2, F)}
+    </svg>`;
+  }
+
+  // 正確：上=face1, 前=face0, 右=face2
+  const correct=makeOpt(1,0,2);
+  // 錯誤：交換各面組合
+  const w1=makeOpt(4,0,2); // 上面用下面圖案
+  const w2=makeOpt(1,2,0); // 前右對調
+  const w3=makeOpt(1,3,5); // 前用後面/右用左面
+
+  // 題目SVG
+  const QW=NW,QH=NH+24;
+  const svgQ=`<svg viewBox="0 0 ${QW} ${QH}" xmlns="http://www.w3.org/2000/svg" width="${QW}" height="${QH}">
+    <rect width="${QW}" height="${QH}" fill="#0f0c29" rx="6"/>
+    <text x="${QW/2}" y="16" fill="#f0edff" font-size="12" font-family="Nunito" text-anchor="middle" font-weight="800">展開圖折起來，上/前/右面各是哪個圖案？</text>
+    <g transform="translate(0,22)"><rect width="${NW}" height="${NH}" fill="#0f0c29" rx="5"/>${ni}</g>
+  </svg>`;
+
+  const{choices,ans}=mOpts(correct,[w1,w2,w3]);
+  return{kind:'visual',svgQ,choices,ans,typeKey:'spatial'};
+}
+
+// ══════════════════════════════════════════════════
+// 新增九宮格題型（更多邏輯、更有挑戰性）
+// ══════════════════════════════════════════════════
+
+// 工具：畫一格背景
+function bg(){return `<rect width="${SV}" height="${SV}" fill="#1a1840" rx="3"/>`;}
+
+// ── 題型：每列形狀旋轉（0/45/90度，每列不同形狀）──
+function gRotShape(){
+  const c=SV/2;
+  // 不對稱形狀：旗形、L形、Z形
+  const shapes=[
+    (f)=>`<polygon points="${c-20},${c+22} ${c-20},${c-22} ${c-8},${c-22} ${c-8},${c-4} ${c+22},${c-18} ${c+22},${c-4} ${c-8},${c-4}" fill="${f}"/>`,
+    (f)=>`<polygon points="${c-20},${c-22} ${c-6},${c-22} ${c-6},${c+8} ${c+20},${c+8} ${c+20},${c+22} ${c-20},${c+22}" fill="${f}"/>`,
+    (f)=>`<polygon points="${c-20},${c-22} ${c+4},${c-22} ${c+4},${c-4} ${c+20},${c-4} ${c+20},${c+22} ${c-4},${c+22} ${c-4},${c+4} ${c-20},${c+4}" fill="${f}"/>`,
+  ];
+  const fills=['#818cf8','#f43f5e','#fbbf24'];
+  // 每欄旋轉：col0=0° col1=90° col2=180°
+  function cell(row,col){
+    const deg=[0,90,180][col];
+    return `${bg()}<g transform="rotate(${deg},${c},${c})">${shapes[row](fills[row])}</g>`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2); // row2, col2 = 180°
+  // 錯誤選項：角度明顯不同（270°）、形狀錯、角度+形狀都錯
+  const w1=`${bg()}<g transform="rotate(270,${c},${c})">${shapes[2](fills[2])}</g>`; // 270°（錯角度）
+  const w2=`${bg()}<g transform="rotate(180,${c},${c})">${shapes[0](fills[2])}</g>`; // 形狀錯
+  const w3=`${bg()}<g transform="rotate(90,${c},${c})">${shapes[2](fills[2])}</g>`;  // 90°（錯角度）
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// ── 題型：每格數量=列×欄（乘法表規律）──
+function gMultiplyCount(){
+  const c=SV/2;
+  const fill=rf(['#818cf8','#f43f5e','#fbbf24','#22d3ee']);
+  const posMap={
+    1:[[c,c]],
+    2:[[c-12,c],[c+12,c]],
+    3:[[c,c-14],[c-12,c+8],[c+12,c+8]],
+    4:[[c-12,c-12],[c+12,c-12],[c-12,c+12],[c+12,c+12]],
+    6:[[c-16,c-14],[c,c-14],[c+16,c-14],[c-16,c+14],[c,c+14],[c+16,c+14]],
+    9:[[c-16,c-16],[c,c-16],[c+16,c-16],[c-16,c],[c,c],[c+16,c],[c-16,c+16],[c,c+16],[c+16,c+16]],
+  };
+  // rowVal × colVal = count；隨機選 rowVals 和 colVals
+  const rv=sh([1,2,3]).slice(0,3); // row multipliers
+  const cv=sh([1,2,3]).slice(0,3); // col multipliers
+  function cell(n){
+    const pts=posMap[Math.min(n,9)]||posMap[9];
+    return `${bg()}${pts.slice(0,n).map(([px,py])=>svgCirc(px,py,6,fill)).join('')}`;
+  }
+  const counts=rv.map(r=>cv.map(c2=>r*c2));
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(counts[r][c2]));
+  const an=counts[2][2];
+  const w1=cell(an+1),w2=cell(Math.max(1,an-1)),w3=cell(an+3);
+  return mkVis(m3x3(cells),cell(an),[w1,w2,w3]);
+}
+
+// ── 題型：XOR格子（第三欄=第一欄 XOR 第二欄）──
+// 每次隨機生成col0和col1，col2=XOR結果
+// 規律：對應格子，兩個都有或都沒有→無，一個有一個沒有→有
+function gXorPattern(){
+  const S=SV, sz=S/3;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+
+  // 隨機生成一個3x3 bitfield（9個bit，確保不全0不全1）
+  function randPat(){
+    let p;
+    do { p=[...Array(9)].map(()=>Math.random()>.5?1:0); }
+    while(p.every(v=>v===0)||p.every(v=>v===1)||p.filter(v=>v).length<2);
+    return p;
+  }
+  function patXor(a,b){return a.map((v,i)=>v^b[i]);}
+
+  // 畫一個格子：pat是9個bit的陣列，fill是顏色
+  function drawPat(pat,fill){
+    let s=`${bg()}`;
+    pat.forEach((v,i)=>{
+      if(v){
+        const col=i%3, row=Math.floor(i/3);
+        s+=`<rect x="${col*sz+2}" y="${row*sz+2}" width="${sz-4}" height="${sz-4}" fill="${fill}" rx="2"/>`;
+      }
+    });
+    return s;
+  }
+
+  // 每列有不同的 col0, col1, col2=XOR
+  const rows=[];
+  for(let r=0;r<3;r++){
+    let p0,p1,p2;
+    // 確保p2不跟p0或p1一樣，且不全空
+    let attempts=0;
+    do {
+      p0=randPat(); p1=randPat(); p2=patXor(p0,p1); attempts++;
+    } while((p2.every(v=>v===0)||p2.every(v=>v===1)||
+             JSON.stringify(p2)===JSON.stringify(p0)||
+             JSON.stringify(p2)===JSON.stringify(p1))&&attempts<30);
+    rows.push([p0,p1,p2]);
+  }
+
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++){
+    cells.push(r===2&&c===2?qCell():drawPat(rows[r][c],fills[r]));
+  }
+  const correct=drawPat(rows[2][2],fills[2]);
+
+  // 錯誤選項：col0、col1、隨機亂的pattern
+  const w1=drawPat(rows[2][0],fills[2]); // col0（不是XOR結果）
+  const w2=drawPat(rows[2][1],fills[2]); // col1（不是XOR結果）
+  // w3：把正確答案的一個bit翻轉
+  const wrongPat=[...rows[2][2]];
+  wrongPat[ri(0,8)]=wrongPat[ri(0,8)]^1;
+  const w3=drawPat(wrongPat,fills[2]);
+
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// ── 題型：對角線規律（主對角線/副對角線有特殊標記）──
+function gDiagonalRule(){
+  const c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24','#22d3ee','#4ade80']);
+  // 規律：主對角線（左上到右下）顏色相同，其他格用另一顏色
+  const diagFill=fills[0], otherFill=fills[1];
+  const shapes=sh([
+    (cx,cy,r,f)=>svgCirc(cx,cy,r,f),
+    (cx,cy,r,f)=>svgRect(cx-r,cy-r,r*2,r*2,f),
+    (cx,cy,r,f)=>svgDiamond(cx,cy,r,f),
+  ]);
+  const shapeFn=shapes[0];
+  function cell(row,col){
+    const isDiag=(row===col);
+    const f=isDiag?diagFill:otherFill;
+    const r=isDiag?22:14; // 對角線更大
+    return `${bg()}${shapeFn(c,c,r,f)}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  // 答案：row2,col2 = 對角線 = 大圓diagFill
+  const correct=cell(2,2);
+  const w1=`${bg()}${shapeFn(c,c,22,otherFill)}`; // 顏色錯
+  const w2=`${bg()}${shapeFn(c,c,14,diagFill)}`;  // 大小錯
+  const w3=`${bg()}${shapeFn(c,c,14,otherFill)}`; // 都錯
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// ── 題型：每格形狀數量=行+列（難）──
+function gRowColSum(){
+  const c=SV/2;
+  const fill=rf(['#818cf8','#f43f5e','#fbbf24']);
+  const posMap=[
+    [],
+    [[c,c]],
+    [[c-14,c],[c+14,c]],
+    [[c,c-14],[c-12,c+8],[c+12,c+8]],
+    [[c-12,c-12],[c+12,c-12],[c-12,c+12],[c+12,c+12]],
+    [[c,c-16],[c-14,c-4],[c+14,c-4],[c-10,c+14],[c+10,c+14]],
+    [[c-16,c-14],[c,c-14],[c+16,c-14],[c-16,c+14],[c,c+14],[c+16,c+14]],
+  ];
+  // count[r][c] = r+c+2（讓最小值=2）
+  function cell(n){
+    const pts=posMap[Math.min(n,6)];
+    return `${bg()}${pts.map(([px,py])=>svgCirc(px,py,6,fill)).join('')}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r+c2+2));
+  const ansN=2+2+2; // row2+col2+2 = 6
+  return mkVis(m3x3(cells),cell(ansN),[cell(ansN-1),cell(ansN+1),cell(ansN-2)]);
+}
+
+// ── 題型：形狀在格內移動（對角線移動）──
+function gDiagMove(){
+  const c=SV/2,sz=SV/3;
+  // 黑塊從左上到右下對角移動
+  // pos: (0,0)→(1,1)→(2,2)→再加一個角位
+  const startPos=ri(0,1); // 0=左上開始, 1=右上開始
+  const paths=[
+    // 左上到右下
+    [[0,0],[1,1],[2,2],[0,1],[1,2],[2,0],[1,0],[0,2],[2,1]],
+    // 右上到左下
+    [[2,0],[1,1],[0,2],[1,0],[2,1],[0,1],[2,2],[1,2],[0,0]],
+  ];
+  const path=paths[startPos];
+  function cell(posIdx){
+    const[col,row]=path[posIdx%9];
+    const x=col*sz,y=row*sz;
+    return `${bg()}${svgGrid(3,'#2a2560')}<rect x="${x+2}" y="${y+2}" width="${sz-4}" height="${sz-4}" fill="#818cf8" rx="2"/>`;
+  }
+  const cells=[...Array(8)].map((_,i)=>cell(i));cells.push(qCell());
+  const correct=cell(8);
+  const w1=cell(7),w2=cell(6),w3=cell(5);
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// ── 題型：每列相減（第三欄=第一欄-第二欄，用點數）──
+function gSubtractCount(){
+  const c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  const posMap=[
+    [[c,c]],
+    [[c-12,c],[c+12,c]],
+    [[c,c-12],[c-12,c+8],[c+12,c+8]],
+    [[c-12,c-12],[c+12,c-12],[c-12,c+12],[c+12,c+12]],
+    [[c,c-16],[c-14,c-4],[c+14,c-4],[c-10,c+14],[c+10,c+14]],
+  ];
+  function cell(n,f){const pts=posMap[Math.min(n-1,4)];return `${bg()}${pts.map(([px,py])=>svgCirc(px,py,7,f)).join('')}`;}
+  // col2 = col0 - col1（確保col0>col1）
+  const makeRow=()=>{const b=ri(2,5),diff=ri(1,b-1);return[b,diff,b-diff];};
+  const rows=[makeRow(),makeRow(),makeRow()];
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(rows[r][c2],fills[r]));
+  const an=rows[2][2];
+  return mkVis(m3x3(cells),cell(an,fills[2]),[cell(an+1,fills[2]),cell(Math.max(1,an-1),fills[2]),cell(an,fills[0])]);
+}
+
+// ── 題型：每格=左格×上格÷左上格（比例規律）──
+function gProportionRule(){
+  const c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24','#22d3ee']);
+  // 每列大小規律：大→中→小（col0=26,col1=18,col2=10）
+  // 每行形狀顏色固定
+  const shapePool=sh([svgCirc,svgDiamond,svgRect.bind(null)]);
+  // 簡化：每格size = baseSize / (col+1)^0.6，顏色按列
+  const baseSizes=[28,20,13];
+  const rowFills=fills.slice(0,3);
+  function drawShape(name,cx,cy,r,f){
+    if(name==='circle')return svgCirc(cx,cy,r,f);
+    if(name==='square')return svgRect(cx-r,cy-r,r*2,r*2,f);
+    return svgDiamond(cx,cy,r,f);
+  }
+  const shNames=sh(['circle','square','diamond']);
+  function cell(row,col){
+    const r=baseSizes[col];
+    return `${bg()}${drawShape(shNames[row],c,c,r,rowFills[row])}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  const w1=`${bg()}${drawShape(shNames[2],c,c,baseSizes[0],rowFills[2])}`; // 大小錯
+  const w2=`${bg()}${drawShape(shNames[0],c,c,baseSizes[2],rowFills[2])}`; // 形狀錯
+  const w3=`${bg()}${drawShape(shNames[2],c,c,baseSizes[2],rowFills[0])}`; // 顏色錯
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// ── 題型：雙重屬性（形狀+顏色，各自有獨立規律）──
+function gDualAttr(){
+  const c=SV/2,r=20;
+  // 形狀規律：每列循環 circle→square→triangle
+  // 顏色規律：每欄循環 紫→紅→黃
+  const shNames=[['circle','square','triangle'],['square','triangle','circle'],['triangle','circle','square']];
+  const colFills=['#818cf8','#f43f5e','#fbbf24'];
+  function drawShape(name,f,size=r){
+    if(name==='circle')return svgCirc(c,c,size,f);
+    if(name==='square')return svgRect(c-size,c-size,size*2,size*2,f);
+    return svgTriUp(c,c,size,f);
+  }
+  function cell(row,col){return `${bg()}${drawShape(shNames[row][col],colFills[col])}`;}
+  const cells=[];
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++)cells.push(row===2&&col===2?qCell():cell(row,col));
+  const correct=cell(2,2);
+  // 錯誤：形狀對顏色錯 / 顏色對形狀錯 / 兩個都錯
+  const w1=`${bg()}${drawShape(shNames[2][2],colFills[0])}`; // 顏色錯
+  const w2=`${bg()}${drawShape(shNames[0][2],colFills[2])}`; // 形狀錯
+  const w3=`${bg()}${drawShape(shNames[1][2],colFills[1])}`; // 都錯
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// ── 題型：每格=右上+左下（對角線加法）──
+function gDiagAdd(){
+  const c=SV/2;
+  const fill=rf(['#818cf8','#22d3ee','#4ade80']);
+  const posMap=[[[c,c]],[[c-12,c],[c+12,c]],[[c,c-12],[c-12,c+8],[c+12,c+8]],[[c-12,c-12],[c+12,c-12],[c-12,c+12],[c+12,c+12]],[[c,c-16],[c-14,c-4],[c+14,c-4],[c-10,c+14],[c+10,c+14]]];
+  function cell(n){return `${bg()}${posMap[Math.min(n-1,4)].map(([px,py])=>svgCirc(px,py,7,fill)).join('')}`;}
+  // 規律：m[r][c] = m[r-1][c] + m[r][c-1] - m[r-1][c-1]（但確保正值）
+  // 用更簡單的：col0是1,2,3；col1是2,3,4；col2=col0+col1
+  const c0=[ri(1,3),ri(1,3),ri(1,3)];
+  const c1=[ri(1,2),ri(1,2),ri(1,2)];
+  const c2=c0.map((v,i)=>v+c1[i]);
+  const grid=[c0,c1,c2];
+  // grid[col][row]: col0=c0,col1=c1,col2=c2
+  const cells=[];
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++)cells.push(row===2&&col===2?qCell():cell(grid[col][row]));
+  const an=grid[2][2]; // col2, row2
+  return mkVis(m3x3(cells),cell(an),[cell(an+1),cell(Math.max(1,an-1)),cell(an+2)]);
+}
+
+// ── 題型：格內有兩個元素，各自獨立變化 ──
+function gTwoElements(){
+  const c=SV/2;
+  // 元素1：小圓，位置在左上/右上/左下（按列循環）
+  // 元素2：小方塊，大小按列遞增
+  const circlePos=[[c-16,c-16],[c+16,c-16],[c-16,c+16],[c+16,c+16]]; // 4個角
+  const squareSizes=[8,12,18];
+  const circleFill='#fbbf24', squareFill='#818cf8';
+  function cell(row,col){
+    const cPos=circlePos[col%4];
+    const sSize=squareSizes[row];
+    return `${bg()}${svgRect(c-sSize,c-sSize,sSize*2,sSize*2,squareFill)}${svgCirc(cPos[0],cPos[1],7,circleFill)}`;
+  }
+  const cells=[];
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++)cells.push(row===2&&col===2?qCell():cell(row,col));
+  const correct=cell(2,2);
+  // 錯誤：圓位置錯 / 方大小錯 / 兩者都錯
+  const w1=`${bg()}${svgRect(c-squareSizes[2],c-squareSizes[2],squareSizes[2]*2,squareSizes[2]*2,squareFill)}${svgCirc(circlePos[0][0],circlePos[0][1],7,circleFill)}`;
+  const w2=`${bg()}${svgRect(c-squareSizes[0],c-squareSizes[0],squareSizes[0]*2,squareSizes[0]*2,squareFill)}${svgCirc(circlePos[2][0],circlePos[2][1],7,circleFill)}`;
+  const w3=`${bg()}${svgRect(c-squareSizes[1],c-squareSizes[1],squareSizes[1]*2,squareSizes[1]*2,squareFill)}${svgCirc(circlePos[1][0],circlePos[1][1],7,circleFill)}`;
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+
+// ══════════════════════════════════════════════════
+// 新增九宮格題型（第二批）
+// ══════════════════════════════════════════════════
+
+// 每列形狀數量遞增（1→2→3），每欄顏色固定
+function gShapeCount(){
+  const c=SV/2;
+  const shFn=rf([
+    (f)=>svgCirc(c,c,10,f),
+    (f)=>svgRect(c-10,c-10,20,20,f),
+    (f)=>svgDiamond(c,c,12,f),
+  ]);
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // 每格畫 (row+1) 個形狀，排成一排
+  function cell(row,col){
+    const n=row+1, f=fills[col];
+    const xs=n===1?[c]:n===2?[c-14,c+14]:[c-18,c,c+18];
+    return `${bg()}${xs.map(x=>`<g transform="translate(${x-c},0)">${shFn(f)}</g>`).join('')}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  return mkVis(m3x3(cells),correct,[cell(2,0),cell(1,2),cell(0,2)]);
+}
+
+// 每格方塊大小=列+欄（加法決定大小）
+function gSizeBySum(){
+  const c=SV/2;
+  const fill=rf(['#818cf8','#f43f5e','#fbbf24','#22d3ee']);
+  const sizeMap=[8,13,18,24,30]; // sizes for sum 2..6
+  function cell(row,col){
+    const s=sizeMap[row+col];
+    return `${bg()}${svgRect(c-s,c-s,s*2,s*2,fill)}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  return mkVis(m3x3(cells),correct,[cell(2,0),cell(0,2),cell(1,1)]);
+}
+
+// 每格圓形半徑=列×欄（乘法決定大小）
+function gSizeByProduct(){
+  const c=SV/2;
+  const fill=rf(['#818cf8','#f43f5e','#fbbf24','#4ade80']);
+  const sizeMap={1:8,2:13,3:18,4:22,6:26,9:30};
+  function cell(row,col){
+    const s=sizeMap[(row+1)*(col+1)]||14;
+    return `${bg()}${svgCirc(c,c,s,fill)}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  return mkVis(m3x3(cells),correct,[cell(2,0),cell(0,2),cell(1,1)]);
+}
+
+// 每行三個形狀各不同（拉丁方陣），顏色也各不同
+function gLatinSquare(){
+  const c=SV/2,r=18;
+  const shOrder=sh(['circle','square','triangle']);
+  const coOrder=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // shape[row][col] 確保每行每列各不同
+  const shGrid=[
+    [shOrder[0],shOrder[1],shOrder[2]],
+    [shOrder[1],shOrder[2],shOrder[0]],
+    [shOrder[2],shOrder[0],shOrder[1]],
+  ];
+  // color[row][col] 獨立循環
+  const coGrid=[
+    [coOrder[0],coOrder[1],coOrder[2]],
+    [coOrder[1],coOrder[2],coOrder[0]],
+    [coOrder[2],coOrder[0],coOrder[1]],
+  ];
+  function draw(name,fill){
+    if(name==='circle')return svgCirc(c,c,r,fill);
+    if(name==='square')return svgRect(c-r,c-r,r*2,r*2,fill);
+    return svgTriUp(c,c,r,fill);
+  }
+  function cell(row,col){return `${bg()}${draw(shGrid[row][col],coGrid[row][col])}`;}
+  const cells=[];
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++)cells.push(row===2&&col===2?qCell():cell(row,col));
+  const correct=cell(2,2);
+  const w1=`${bg()}${draw(shGrid[2][0],coGrid[2][2])}`; // 形狀錯
+  const w2=`${bg()}${draw(shGrid[2][2],coGrid[2][0])}`; // 顏色錯
+  const w3=`${bg()}${draw(shGrid[0][0],coGrid[1][1])}`; // 全錯
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 圓形從左到右移動（在格內位置變化）
+function gCircleMove(){
+  const S=SV;
+  // 3個位置：左/中/右
+  const xPos=[S*0.22,S*0.5,S*0.78];
+  // 3個垂直位置：上/中/下
+  const yPos=[S*0.22,S*0.5,S*0.78];
+  const fill=rf(['#818cf8','#f43f5e','#fbbf24','#22d3ee']);
+  // col決定x位置，row決定y位置
+  function cell(row,col){
+    return `${bg()}${svgCirc(xPos[col],yPos[row],10,fill)}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++)cells.push(r===2&&c===2?qCell():cell(r,c));
+  const correct=cell(2,2);
+  return mkVis(m3x3(cells),correct,[cell(2,0),cell(2,1),cell(0,2)]);
+}
+
+// 每格有一條線，角度按規律旋轉
+function gLineAngle(){
+  const c=SV/2,L=24;
+  const fill='#818cf8';
+  // 每欄角度：0°/45°/90°；每列顏色不同
+  const angles=[0,45,90];
+  const fills=['#818cf8','#f43f5e','#fbbf24'];
+  function line(deg,f){
+    const r=deg*Math.PI/180;
+    const x1=c-L*Math.cos(r),y1=c-L*Math.sin(r);
+    const x2=c+L*Math.cos(r),y2=c+L*Math.sin(r);
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${f}" stroke-width="5" stroke-linecap="round"/>`;
+  }
+  function cell(row,col){return `${bg()}${line(angles[col],fills[row])}`;}
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  return mkVis(m3x3(cells),correct,[
+    `${bg()}${line(135,fills[2])}`,  // 角度錯135°
+    `${bg()}${line(90,fills[0])}`,   // 顏色錯
+    `${bg()}${line(45,fills[2])}`,   // 角度錯45°
+  ]);
+}
+
+// 每格小方格數量（像骰子點數規律）
+function gDicePattern(){
+  const c=SV/2;
+  // 骰子式排列：1-6點
+  const dicePts={
+    1:[[c,c]],
+    2:[[c-14,c-14],[c+14,c+14]],
+    3:[[c-14,c-14],[c,c],[c+14,c+14]],
+    4:[[c-14,c-14],[c+14,c-14],[c-14,c+14],[c+14,c+14]],
+    5:[[c-14,c-14],[c+14,c-14],[c,c],[c-14,c+14],[c+14,c+14]],
+    6:[[c-14,c-16],[c+14,c-16],[c-14,c],[c+14,c],[c-14,c+16],[c+14,c+16]],
+  };
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // 規律：每格值 = (row+1)+(col+1)，最大6
+  function cell(row,col){
+    const n=Math.min((row+1)+(col+1),6);
+    const pts=dicePts[n];
+    return `${bg()}${pts.map(([px,py])=>svgCirc(px,py,7,fills[row])).join('')}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2); // (3)+(3)=6
+  return mkVis(m3x3(cells),correct,[cell(1,2),cell(2,1),cell(2,0)]);
+}
+
+// 每格圖案=上面格+左邊格（二維費氏）
+function gGrid2DFib(){
+  const c=SV/2;
+  const fill=rf(['#818cf8','#f43f5e','#fbbf24','#22d3ee']);
+  const posMap=[[[c,c]],[[c-12,c],[c+12,c]],[[c,c-12],[c-12,c+8],[c+12,c+8]],[[c-12,c-12],[c+12,c-12],[c-12,c+12],[c+12,c+12]],[[c,c-16],[c-14,c-4],[c+14,c-4],[c-10,c+14],[c+10,c+14]],[[c-14,c-14],[c,c-14],[c+14,c-14],[c-14,c+14],[c,c+14],[c+14,c+14]]];
+  function cell(n){return `${bg()}${posMap[Math.min(n-1,5)].map(([px,py])=>svgCirc(px,py,7,fill)).join('')}`;}
+  // grid[r][c]值：row0=[1,1,2], row1=[1,2,3], row2=[2,3,?=5]
+  const a=ri(1,2),b=ri(1,2);
+  const grid=[[a,b,a+b],[b,a+b,a+2*b],[a+b,a+2*b,2*a+3*b]];
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(grid[r][c2]));
+  const an=grid[2][2];
+  return mkVis(m3x3(cells),cell(an),[cell(an-1),cell(an+1),cell(an-2)]);
+}
+
+// 形狀在格內縮放（每欄縮小），背景顯示輪廓
+function gShrinkShape(){
+  const c=SV/2;
+  const shName=rf(['circle','square','diamond']);
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  const sizes=[26,17,9];
+  function draw(name,fill,size){
+    if(name==='circle')return svgCirc(c,c,size,fill);
+    if(name==='square')return svgRect(c-size,c-size,size*2,size*2,fill);
+    return svgDiamond(c,c,size,fill);
+  }
+  function drawOutline(name,size){
+    const stroke='#4a4880',sw=2;
+    if(name==='circle')return `<circle cx="${c}" cy="${c}" r="${size}" fill="none" stroke="${stroke}" stroke-width="${sw}"/>`;
+    if(name==='square')return `<rect x="${c-size}" y="${c-size}" width="${size*2}" height="${size*2}" fill="none" stroke="${stroke}" stroke-width="${sw}"/>`;
+    return `<polygon points="${c},${c-size} ${c+size},${c} ${c},${c+size} ${c-size},${c}" fill="none" stroke="${stroke}" stroke-width="${sw}"/>`;
+  }
+  function cell(row,col){
+    return `${bg()}${drawOutline(shName,sizes[0])}${draw(shName,fills[row],sizes[col])}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  const w1=`${bg()}${drawOutline(shName,sizes[0])}${draw(shName,fills[2],sizes[0])}`; // 大小錯
+  const w2=`${bg()}${drawOutline(shName,sizes[0])}${draw(shName,fills[0],sizes[2])}`; // 顏色錯
+  const w3=`${bg()}${drawOutline(shName,sizes[0])}${draw(shName,fills[2],sizes[1])}`; // 大小錯（中）
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 旋轉方向規律（每格箭頭角度）
+function gArrowRotate(){
+  const c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // 每格箭頭角度：row0=[0,45,90], row1=[45,90,135], row2=[90,135,180]
+  function arrow(deg,fill){
+    const R=22,r2=9;
+    const body=`<polygon points="${c-R},${c-r2} ${c},${c-r2} ${c},${c-R*0.7} ${c+R},${c} ${c},${c+R*0.7} ${c},${c+r2} ${c-R},${c+r2}" fill="${fill}"/>`;
+    return `<g transform="rotate(${deg},${c},${c})">${body}</g>`;
+  }
+  function cell(row,col){
+    const deg=(row+col)*45;
+    return `${bg()}${arrow(deg,fills[row])}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2); // deg=(2+2)*45=180°, fills[2]
+  const w1=`${bg()}${arrow(225,fills[2])}`; // 角度多45°
+  const w2=`${bg()}${arrow(180,fills[0])}`; // 顏色錯
+  const w3=`${bg()}${arrow(135,fills[2])}`; // 角度少45°
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 每格有N個同心環（N=行號+1）且形狀按列變
+function gConcentricVar(){
+  const c=SV/2;
+  const shTypes=['circle','square','diamond'];
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  function drawConc(shType,layers,fill){
+    let s='';
+    for(let i=layers;i>=1;i--){
+      const r=(c-5)*i/layers;
+      const isFill=i===layers;
+      const f=isFill?fill:'#1a1840';
+      if(shType==='circle')s+=`<circle cx="${c}" cy="${c}" r="${r}" fill="${f}" stroke="${fill}" stroke-width="1.5"/>`;
+      else if(shType==='square')s+=`<rect x="${c-r}" y="${c-r}" width="${r*2}" height="${r*2}" fill="${f}" stroke="${fill}" stroke-width="1.5" rx="2"/>`;
+      else s+=`<polygon points="${c},${c-r} ${c+r},${c} ${c},${c+r} ${c-r},${c}" fill="${f}" stroke="${fill}" stroke-width="1.5"/>`;
+    }
+    return s;
+  }
+  function cell(row,col){return `${bg()}${drawConc(shTypes[col],row+1,fills[col])}`;}
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  const w1=`${bg()}${drawConc(shTypes[2],1,fills[2])}`; // 層數錯（1層）
+  const w2=`${bg()}${drawConc(shTypes[0],3,fills[2])}`; // 形狀錯
+  const w3=`${bg()}${drawConc(shTypes[2],2,fills[2])}`; // 層數錯（2層）
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 每格有兩種形狀疊加（規律：外圈+內圈各自變化）
+function gNestedShapes(){
+  const c=SV/2;
+  const outerShapes=['circle','square','diamond'];
+  const innerShapes=['square','diamond','circle'];
+  const outerFills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  const innerFill='#f0edff';
+  function draw(name,r,fill){
+    if(name==='circle')return svgCirc(c,c,r,fill);
+    if(name==='square')return svgRect(c-r,c-r,r*2,r*2,fill);
+    return svgDiamond(c,c,r,fill);
+  }
+  // outer: 按row變，inner: 按col變，大小固定
+  function cell(row,col){
+    return `${bg()}${draw(outerShapes[row],24,outerFills[row])}${draw(innerShapes[col],11,innerFill)}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  const w1=`${bg()}${draw(outerShapes[2],24,outerFills[2])}${draw(innerShapes[0],11,innerFill)}`; // 內圈錯
+  const w2=`${bg()}${draw(outerShapes[0],24,outerFills[0])}${draw(innerShapes[2],11,innerFill)}`; // 外圈錯
+  const w3=`${bg()}${draw(outerShapes[2],24,outerFills[0])}${draw(innerShapes[2],11,innerFill)}`; // 顏色錯
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 每格方格數=欄號+1，顏色按行（分格填色）
+function gGridFill(){
+  const S=SV;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // col0=1格填滿，col1=左半填，col2=左1/3填
+  function cell(row,col){
+    const f=fills[row];
+    const n=col+1; // 分成n格，填左邊1格
+    const w=Math.floor(S/n);
+    return `${bg()}${`<rect x="0" y="0" width="${w}" height="${S}" fill="${f}" rx="2"/>`}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  const w1=`${bg()}<rect x="0" y="0" width="${S}" height="${S}" fill="${fills[2]}" rx="2"/>`; // 全填
+  const w2=`${bg()}<rect x="0" y="0" width="${Math.floor(S/2)}" height="${S}" fill="${fills[2]}" rx="2"/>`; // 1/2
+  const w3=`${bg()}<rect x="0" y="0" width="${Math.floor(S/3)}" height="${S}" fill="${fills[0]}" rx="2"/>`; // 顏色錯
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 每格顯示第N個圖形（序列展示在格內）
+function gSeqInGrid(){
+  const c=SV/2;
+  // 3種形狀循環：格(r,c)顯示第(r*3+c+1)個
+  const shSeq=['circle','square','triangle','diamond','circle','square','triangle','diamond','circle'];
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24','#22d3ee']);
+  const fillSeq=fills.concat(fills); // 循環顏色
+  function draw(name,fill,r2=18){
+    if(name==='circle')return svgCirc(c,c,r2,fill);
+    if(name==='square')return svgRect(c-r2,c-r2,r2*2,r2*2,fill);
+    if(name==='triangle')return svgTriUp(c,c,r2,fill);
+    return svgDiamond(c,c,r2,fill);
+  }
+  // 規律：每格形狀從序列取，顏色=對應的循環
+  function cell(idx){return `${bg()}${draw(shSeq[idx],fillSeq[idx])}`;}
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r*3+c2));
+  // 答案是序列第8個（idx=8）
+  const correct=cell(8);
+  return mkVis(m3x3(cells),correct,[cell(7),cell(6),cell(5)]);
+}
+
+// 每行三格的形狀構成一個加法（大+中=？）
+function gShapeAdd(){
+  const c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // 大小加法：col0大，col1中，col2=兩者之差（小）
+  const bigSizes=[26,24,22];
+  const midSizes=[14,12,10];
+  const smallSizes=bigSizes.map((b,i)=>b-midSizes[i]);
+  function cell(row,col){
+    const f=fills[row];
+    const sizes=[bigSizes[row],midSizes[row],smallSizes[row]];
+    return `${bg()}${svgCirc(c,c,sizes[col],f)}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  const w1=`${bg()}${svgCirc(c,c,midSizes[2],fills[2])}`;  // 大小錯（中）
+  const w2=`${bg()}${svgCirc(c,c,bigSizes[2],fills[2])}`;  // 大小錯（大）
+  const w3=`${bg()}${svgCirc(c,c,smallSizes[2],fills[0])}`; // 顏色錯
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 每格有L形在不同角落（旋轉規律）
+function gLShapeCorner(){
+  const S=SV,c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // L形固定大小，旋轉角度：col0=0,col1=90,col2=180；row決定顏色
+  function lShape(fill){
+    return `<polygon points="${c-22},${c-22} ${c+2},${c-22} ${c+2},${c-6} ${c+22},${c-6} ${c+22},${c+22} ${c-22},${c+22}" fill="${fill}"/>`;
+  }
+  function cell(row,col){
+    const deg=[0,90,180][col];
+    return `${bg()}<g transform="rotate(${deg},${c},${c})">${lShape(fills[row])}</g>`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2); // 180°, fills[2]
+  const w1=`${bg()}<g transform="rotate(270,${c},${c})">${lShape(fills[2])}</g>`; // 270°
+  const w2=`${bg()}<g transform="rotate(180,${c},${c})">${lShape(fills[0])}</g>`; // 顏色錯
+  const w3=`${bg()}<g transform="rotate(90,${c},${c})">${lShape(fills[2])}</g>`;  // 90°
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 每格有N條線（數量規律）
+function gLineCount(){
+  const c=SV/2,L=26;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // col0=1條線，col1=2條線，col2=3條線；row決定顏色
+  function lines(n,fill){
+    const angles=n===1?[0]:n===2?[-30,30]:[-45,0,45];
+    return angles.map(deg=>{
+      const r=deg*Math.PI/180;
+      return `<line x1="${c-L*Math.cos(r)}" y1="${c-L*Math.sin(r)}" x2="${c+L*Math.cos(r)}" y2="${c+L*Math.sin(r)}" stroke="${fill}" stroke-width="4" stroke-linecap="round"/>`;
+    }).join('');
+  }
+  function cell(row,col){return `${bg()}${lines(col+1,fills[row])}`;}
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2); // 3條線，fills[2]
+  return mkVis(m3x3(cells),correct,[
+    `${bg()}${lines(3,fills[0])}`,  // 顏色錯
+    `${bg()}${lines(2,fills[2])}`,  // 線條數錯
+    `${bg()}${lines(1,fills[2])}`,  // 線條數錯
+  ]);
+}
+
+// 每格漸變填充（左側深→右側淡，按列深度變）
+function gGradientFill(){
+  const c=SV/2,S=SV;
+  const colFills=[['#818cf8','#5b5fae','#3d4090'],['#f43f5e','#b02b42','#7c1c2e'],['#fbbf24','#b38a1a','#7a5e0f']];
+  // row0-2是顏色組，col0-2是同組的淡/中/深
+  function cell(row,col){
+    return `${bg()}${svgCirc(c,c,22,colFills[row][col])}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2); // row2最深色，col2最深
+  const w1=`${bg()}${svgCirc(c,c,22,colFills[2][0])}`; // 顏色錯（淡）
+  const w2=`${bg()}${svgCirc(c,c,22,colFills[0][2])}`; // 顏色錯（另一組）
+  const w3=`${bg()}${svgCirc(c,c,22,colFills[2][1])}`; // 顏色錯（中）
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 框線粗細遞增規律
+function gBorderWeight(){
+  const c=SV/2,r=22;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  const weights=[1,3,6]; // col決定框線粗細
+  function cell(row,col){
+    return `${bg()}<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${fills[row]}" stroke-width="${weights[col]}"/>`;
+  }
+  const cells=[];
+  for(let r2=0;r2<3;r2++)for(let c2=0;c2<3;c2++)cells.push(r2===2&&c2===2?qCell():cell(r2,c2));
+  const correct=cell(2,2);
+  return mkVis(m3x3(cells),correct,[
+    `${bg()}<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${fills[2]}" stroke-width="${weights[0]}"/>`, // 粗細錯
+    `${bg()}<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${fills[0]}" stroke-width="${weights[2]}"/>`, // 顏色錯
+    `${bg()}<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${fills[2]}" stroke-width="${weights[1]}"/>`, // 粗細錯（中）
+  ]);
+}
+
+// 雙形狀：大小關係（大圓+小圓，按列比例變化）
+function gRelativeSize(){
+  const c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // col0:大圓大小方=26/8, col1:相等=17/17, col2:小圓大=8/26
+  const sizes=[[26,8],[17,17],[8,26]];
+  function cell(row,col){
+    const[r1,r2]=sizes[col];
+    const f=fills[row];
+    return `${bg()}${svgCirc(c-14,c,r1,f)}${svgRect(c+2,c-r2,r2*2,r2*2,'#f0edff')}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  const correct=cell(2,2);
+  const w1=`${bg()}${svgCirc(c-14,c,sizes[0][0],fills[2])}${svgRect(c+2,c-sizes[0][1],sizes[0][1]*2,sizes[0][1]*2,'#f0edff')}`; // 大小比例錯
+  const w2=`${bg()}${svgCirc(c-14,c,sizes[2][0],fills[0])}${svgRect(c+2,c-sizes[2][1],sizes[2][1]*2,sizes[2][1]*2,'#f0edff')}`; // 顏色錯
+  const w3=`${bg()}${svgCirc(c-14,c,sizes[1][0],fills[2])}${svgRect(c+2,c-sizes[1][1],sizes[1][1]*2,sizes[1][1]*2,'#f0edff')}`; // 中間值
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// 每格=前格旋轉45°（螺旋旋轉規律）
+function gSpiralRotate(){
+  const c=SV/2;
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24']);
+  // 不對稱L形，每格旋轉45°累積
+  function lShape(fill){
+    return `<polygon points="${c-20},${c-20} ${c+4},${c-20} ${c+4},${c-4} ${c+20},${c-4} ${c+20},${c+20} ${c-20},${c+20}" fill="${fill}"/>`;
+  }
+  // grid(r,c)的旋轉角度 = (r*3+c)*45
+  function cell(row,col){
+    const deg=(row*3+col)*45%360;
+    return `${bg()}<g transform="rotate(${deg},${c},${c})">${lShape(fills[row])}</g>`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(r,c2));
+  // 答案：(2*3+2)*45=360°=0°, fills[2]
+  const correct=cell(2,2);
+  const w1=`${bg()}<g transform="rotate(45,${c},${c})">${lShape(fills[2])}</g>`;  // 45°
+  const w2=`${bg()}<g transform="rotate(0,${c},${c})">${lShape(fills[0])}</g>`;   // 顏色錯
+  const w3=`${bg()}<g transform="rotate(315,${c},${c})">${lShape(fills[2])}</g>`; // 315°
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+
+// ══════════════════════════════════════════════════
+// 邏輯運算題：AND / OR / XOR（隨機格子圖案）
+// ══════════════════════════════════════════════════
+// 每格是一個 3×3 小方格陣列（9個格子各自填/空）
+// 題目：A op B = ?  選出正確的結果
+
+function randomBits(density=0.5){
+  // 生成9個bit，density控制填色比例
+  return Array.from({length:9},()=>Math.random()<density?1:0);
+}
+function bitsAnd(a,b){return a.map((v,i)=>v&b[i]);}
+function bitsOr(a,b){return a.map((v,i)=>v|b[i]);}
+function bitsXor(a,b){return a.map((v,i)=>v^b[i]);}
+function bitsNot(a){return a.map(v=>v?0:1);}
+
+function drawBits(bits,fill,emptyFill='#2a2560'){
+  const sz=SV/3;
+  return bits.map((v,i)=>{
+    const col=i%3,row=Math.floor(i/3);
+    const x=col*sz,y=row*sz;
+    const f=v?fill:emptyFill;
+    return `<rect x="${x+1.5}" y="${y+1.5}" width="${sz-3}" height="${sz-3}" fill="${f}" rx="2"/>`;
+  }).join('');
+}
+
+function drawBitsCell(bits,fill){
+  return `${bg()}${drawBits(bits,fill)}`;
+}
+
+// 確保兩個bit陣列不完全相同
+function distinctBits(a,b){
+  return a.some((v,i)=>v!==b[i]);
+}
+
+// 生成一道 AND/OR/XOR 題
+function gLogicOp(opName){
+  const fills=sh(['#818cf8','#f43f5e','#fbbf24','#22d3ee','#4ade80']);
+  const fillA=fills[0], fillB=fills[1], fillAns=fills[2];
+
+  // 隨機生成 A 和 B，確保不完全相同、結果不全空也不全填
+  let A,B,C;
+  let tries=0;
+  do {
+    A=randomBits(0.45);
+    B=randomBits(0.45);
+    if(opName==='AND') C=bitsAnd(A,B);
+    else if(opName==='OR') C=bitsOr(A,B);
+    else C=bitsXor(A,B);
+    tries++;
+  } while(tries<30 && (!distinctBits(A,B) || C.every(v=>!v) || C.every(v=>v) || !distinctBits(A,C) || !distinctBits(B,C)));
+
+  // 3個錯誤選項：NOT C / C OR A / 隨機亂位
+  const wrong1=bitsNot(C);
+  const wrong2=opName==='AND'?bitsOr(A,B):bitsAnd(A,B);
+  // wrong3：把C隨機翻轉2-3個bit
+  const wrong3=[...C];
+  const flips=sh([0,1,2,3,4,5,6,7,8]).slice(0,ri(2,3));
+  flips.forEach(i=>wrong3[i]=wrong3[i]?0:1);
+
+  // 確保錯誤選項都不等於正確答案
+  const allWrongs=[wrong1,wrong2,wrong3].filter(w=>distinctBits(w,C));
+  while(allWrongs.length<3){
+    const extra=[...C];
+    sh([0,1,2,3,4,5,6,7,8]).slice(0,ri(1,2)).forEach(i=>extra[i]=extra[i]?0:1);
+    if(distinctBits(extra,C)) allWrongs.push(extra);
+  }
+
+  const opSymbol={'AND':'∩','OR':'∪','XOR':'⊕'}[opName];
+
+  // 題目SVG：顯示 A [op] B = ?（橫向排列）
+  const W=SV,H=SV,gap=18,labelH=16;
+  const totalW=W*3+gap*2+W; // A + op + B + = + ?
+  const svgQ=`<svg viewBox="0 0 ${totalW} ${H+labelH}" xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${H+labelH}">
+    <rect width="${totalW}" height="${H+labelH}" fill="#0f0c29" rx="6"/>
+    <!-- A -->
+    <text x="${W/2}" y="12" fill="${fillA}" font-size="11" font-family="Nunito" text-anchor="middle" font-weight="800">A</text>
+    <g transform="translate(0,${labelH})">${bg()}${drawBits(A,fillA)}</g>
+    <!-- op -->
+    <text x="${W+gap/2}" y="${H/2+labelH}" fill="#f0edff" font-size="20" font-family="Nunito" text-anchor="middle" dominant-baseline="middle" font-weight="900">${opSymbol}</text>
+    <!-- B -->
+    <text x="${W+gap+W/2}" y="12" fill="${fillB}" font-size="11" font-family="Nunito" text-anchor="middle" font-weight="800">B</text>
+    <g transform="translate(${W+gap},${labelH})">${bg()}${drawBits(B,fillB)}</g>
+    <!-- = -->
+    <text x="${W*2+gap*1.5+gap/2}" y="${H/2+labelH}" fill="#f0edff" font-size="20" font-family="Nunito" text-anchor="middle" dominant-baseline="middle" font-weight="900">=</text>
+    <!-- ? -->
+    <g transform="translate(${W*2+gap*2},${labelH})">${qCell()}</g>
+  </svg>`;
+
+  const correctSvg=drawBitsCell(C,fillAns);
+  const{choices,ans}=mOpts(correctSvg,allWrongs.slice(0,3).map(w=>drawBitsCell(w,fillAns)));
+  return{kind:'visual',svgQ,choices,ans,typeKey:'shape'};
+}
+
+function gAnd(){return gLogicOp('AND');}
+function gOr(){return gLogicOp('OR');}
+function gXor(){return gLogicOp('XOR');}
+
+// 進階：A AND B AND C（三個操作數）
+function gAndAnd(){
+  const fills=['#818cf8','#f43f5e','#fbbf24','#22d3ee'];
+  let A,B,C2,result;
+  let tries=0;
+  do{
+    A=randomBits(0.6);B=randomBits(0.6);C2=randomBits(0.6);
+    result=bitsAnd(bitsAnd(A,B),C2);
+    tries++;
+  }while(tries<30&&(result.every(v=>!v)||result.every(v=>v)));
+
+  const wrong1=bitsAnd(A,B);
+  const wrong2=bitsOr(bitsAnd(A,B),C2);
+  const wrong3=[...result];
+  sh([0,1,2,3,4,5,6,7,8]).slice(0,2).forEach(i=>wrong3[i]=wrong3[i]?0:1);
+
+  const W=SV,labelH=16,gap=14;
+  const totalW=W*4+gap*3+W;
+  const svgQ=`<svg viewBox="0 0 ${totalW} ${W+labelH}" xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${W+labelH}">
+    <rect width="${totalW}" height="${W+labelH}" fill="#0f0c29" rx="6"/>
+    <text x="${W/2}" y="12" fill="${fills[0]}" font-size="11" font-family="Nunito" text-anchor="middle" font-weight="800">A</text>
+    <g transform="translate(0,${labelH})">${bg()}${drawBits(A,fills[0])}</g>
+    <text x="${W+gap/2}" y="${W/2+labelH}" fill="#f0edff" font-size="16" font-family="Nunito" text-anchor="middle" dominant-baseline="middle" font-weight="900">∩</text>
+    <text x="${W+gap+W/2}" y="12" fill="${fills[1]}" font-size="11" font-family="Nunito" text-anchor="middle" font-weight="800">B</text>
+    <g transform="translate(${W+gap},${labelH})">${bg()}${drawBits(B,fills[1])}</g>
+    <text x="${W*2+gap*1.5+gap/2}" y="${W/2+labelH}" fill="#f0edff" font-size="16" font-family="Nunito" text-anchor="middle" dominant-baseline="middle" font-weight="900">∩</text>
+    <text x="${W*2+gap*2+W/2}" y="12" fill="${fills[2]}" font-size="11" font-family="Nunito" text-anchor="middle" font-weight="800">C</text>
+    <g transform="translate(${W*2+gap*2},${labelH})">${bg()}${drawBits(C2,fills[2])}</g>
+    <text x="${W*3+gap*2.5+gap/2}" y="${W/2+labelH}" fill="#f0edff" font-size="16" font-family="Nunito" text-anchor="middle" dominant-baseline="middle" font-weight="900">=</text>
+    <g transform="translate(${W*3+gap*3},${labelH})">${qCell()}</g>
+  </svg>`;
+
+  const correctSvg=drawBitsCell(result,fills[3]);
+  const allWrongs=[wrong1,wrong2,wrong3].map(w=>drawBitsCell(w,fills[3]));
+  const{choices,ans}=mOpts(correctSvg,allWrongs);
+  return{kind:'visual',svgQ,choices,ans,typeKey:'shape'};
+}
+
+// 進階：(A OR B) AND C
+function gOrAndCombo(){
+  const fills=['#818cf8','#f43f5e','#fbbf24','#4ade80'];
+  let A,B,C2,result;
+  let tries=0;
+  do{
+    A=randomBits(0.45);B=randomBits(0.45);C2=randomBits(0.55);
+    result=bitsAnd(bitsOr(A,B),C2);
+    tries++;
+  }while(tries<30&&(result.every(v=>!v)||result.every(v=>v)));
+
+  const wrong1=bitsOr(A,B);          // 忘記AND C
+  const wrong2=bitsAnd(A,C2);        // 忘記OR B
+  const wrong3=bitsOr(bitsAnd(A,B),C2); // 順序錯
+  const W=SV,labelH=18,gap=12;
+  const totalW=W*4+gap*4;
+  const svgQ=`<svg viewBox="0 0 ${totalW} ${W+labelH+8}" xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${W+labelH+8}">
+    <rect width="${totalW}" height="${W+labelH+8}" fill="#0f0c29" rx="6"/>
+    <text x="${W/2}" y="13" fill="${fills[0]}" font-size="11" font-family="Nunito" text-anchor="middle" font-weight="800">A</text>
+    <g transform="translate(0,${labelH})">${bg()}${drawBits(A,fills[0])}</g>
+    <text x="${W+gap/2}" y="${W/2+labelH}" fill="#a78bfa" font-size="15" font-family="Nunito" text-anchor="middle" dominant-baseline="middle" font-weight="900">∪</text>
+    <text x="${W+gap+W/2}" y="13" fill="${fills[1]}" font-size="11" font-family="Nunito" text-anchor="middle" font-weight="800">B</text>
+    <g transform="translate(${W+gap},${labelH})">${bg()}${drawBits(B,fills[1])}</g>
+    <text x="${W*2+gap*1.5+gap/2}" y="${W/2+labelH}" fill="#f43f5e" font-size="15" font-family="Nunito" text-anchor="middle" dominant-baseline="middle" font-weight="900">∩</text>
+    <text x="${W*2+gap*2+W/2}" y="13" fill="${fills[2]}" font-size="11" font-family="Nunito" text-anchor="middle" font-weight="800">C</text>
+    <g transform="translate(${W*2+gap*2},${labelH})">${bg()}${drawBits(C2,fills[2])}</g>
+    <text x="${W*3+gap*3+gap/2}" y="${W/2+labelH}" fill="#f0edff" font-size="15" font-family="Nunito" text-anchor="middle" dominant-baseline="middle" font-weight="900">=</text>
+    <g transform="translate(${W*3+gap*4},${labelH})">${qCell()}</g>
+  </svg>`;
+
+  const correctSvg=drawBitsCell(result,fills[3]);
+  const allWrongs=[wrong1,wrong2,wrong3].map(w=>drawBitsCell(w,fills[3]));
+  const{choices,ans}=mOpts(correctSvg,allWrongs);
+  return{kind:'visual',svgQ,choices,ans,typeKey:'shape'};
+}
+
+
+const SPATG={
+  easy:[
+    ()=>gSize(), ()=>gCount(), ()=>gFill(), ()=>gMove(),
+    ()=>gDiagonalRule(), ()=>gProportionRule(), ()=>gDualAttr(),
+    ()=>gShapeCount(), ()=>gSizeBySum(), ()=>gCircleMove(),
+    ()=>gLineCount(), ()=>gDicePattern(), ()=>gShrinkShape(),
+    ()=>gLatinSquare(), ()=>gGridFill(),
+  ],
+  medium:[
+    ()=>gConcentric(), ()=>gAdd(), ()=>gSubtractCount(), ()=>gMultiplyCount(),
+    ()=>gRowColSum(), ()=>gDiagMove(), ()=>gTwoElements(), ()=>gDualAttr(),
+    ()=>gSizeByProduct(), ()=>gLineAngle(), ()=>gArrowRotate(),
+    ()=>gConcentricVar(), ()=>gNestedShapes(), ()=>gBorderWeight(),
+    ()=>gShapeAdd(), ()=>gGradientFill(), ()=>gRelativeSize(),
+  ],
+  hard:[
+    ()=>gSubst(), ()=>gConcentric(), ()=>gDiagAdd(), ()=>gRotShape(),
+    ()=>gMultiplyCount(), ()=>gTwoElements(), ()=>gDiagonalRule(),
+    ()=>gGrid2DFib(), ()=>gLShapeCorner(), ()=>gSeqInGrid(),
+    ()=>gSpiralRotate(), ()=>gNestedShapes(), ()=>gConcentricVar(),
+    ()=>gArrowRotate(), ()=>gRelativeSize(),
+    ()=>gAnd(), ()=>gOr(), ()=>gXor(),
+  ],
+  hell:[
+    ()=>gDiagAdd(), ()=>gRotShape(), ()=>gSubst(),
+    ()=>gTwoElements(), ()=>gMultiplyCount(), ()=>gDiagMove(), ()=>gSubtractCount(),
+    ()=>gGrid2DFib(), ()=>gSpiralRotate(), ()=>gLShapeCorner(),
+    ()=>gSeqInGrid(), ()=>gArrowRotate(), ()=>gLatinSquare(),
+    ()=>gConcentricVar(), ()=>gNestedShapes(),
+    ()=>gAnd(), ()=>gOr(), ()=>gXor(), ()=>gAndAnd(), ()=>gOrAndCombo(),
+  ]
+};
+
+// ── GENERATE ────────────────────────────────────
+function pickGen(gens){for(let i=0;i<10;i++){const g=rf(gens);const q=g();if(q&&q.ans!==undefined)return q;}return gens[0]();}
+function generateQ(){
+  const allTypes=['math','calc','shape','missing'];
+  let t;
+  if(mode==='mix'){const cycle=['math','calc','shape','missing','shape','math','calc','shape','missing','shape','math','calc','shape','missing','shape','math','calc','shape','missing','shape'];t=cycle[qi]||rf(allTypes);}
+  else t=mode;
+  const gens={math:MG[diff],calc:CG[diff],shape:SHG[diff],missing:MISG[diff]};
+  // shape 模式只用九宮格矩陣題
+  if(t==='shape'){
+    let q=pickGen(SPATG[diff]);q.typeKey='shape';return q;
+  }
+  let q=pickGen(gens[t]);q.typeKey=q.typeKey||t;return q;
+}
+
+// ── CHOICES ─────────────────────────────────────
+function makeChoices(q){
+  if(Array.isArray(q.choices)&&q.choices.length>=4)return q.choices;
+  const ans=q.ans;
+  if(typeof ans==='string'&&isNaN(Number(ans))){const pool=['正方形','長方形','三角形','梯形','圓形','菱形'];return sh([ans,...sh(pool.filter(s=>s!==ans)).slice(0,3)]);}
+  const n=Number(ans);const sp={easy:[1,2,3,5],medium:[2,5,10,15],hard:[3,8,14,21],hell:[4,10,18,30]}[diff];
+  const opts=new Set([n]);let tries=0;
+  while(opts.size<4&&tries<120){const d=rf(sp)*(Math.random()>.5?1:-1);const v=Math.round(n+d);if(v>=0&&v!==n)opts.add(v);tries++;}
+  let ext=1;while(opts.size<4){opts.add(n+ext);ext++;}return sh([...opts]);
+}
+
+// ── RENDER ──────────────────────────────────────
+function el(tag,cls=''){const e=document.createElement(tag);if(cls)e.className=cls;return e;}
+function render(q){
+  curQ=q;
+  const QC=document.getElementById('qcontent'),QL=document.getElementById('qlabel'),CD=document.getElementById('choices');
+  CD.className='choices';QC.className='qtext';QC.removeAttribute('style');
+  const labels={math:'數列規律',calc:'四則運算',shape:'圖形規律',missing:'填空題',spatial:'空間邏輯'};
+  QL.textContent=labels[q.typeKey]||'動動腦';
+  if(q.kind==='seq'){
+    QC.innerHTML='';const row=el('div','seq-row');
+    q.seq.forEach((v,i)=>{const c=el('div','sc'+(v==='?'?' blank':''));c.textContent=String(v);row.appendChild(c);if(i<q.seq.length-1){const a=el('div','sarr');a.textContent='→';row.appendChild(a);}});
+    QC.appendChild(row);
+  }else if(q.kind==='shape'){
+    QC.innerHTML='';const row=el('div','shape-row');
+    q.seq.forEach((v,i)=>{const c=el('div','shc'+(v==='?'?' blank':''));c.style.fontSize=[...String(v)].length>2?'.9rem':'1.6rem';c.textContent=String(v);row.appendChild(c);if(i<q.seq.length-1){const a=el('div');a.style.cssText='color:var(--sub);font-size:.82rem;padding:0 2px';a.textContent='→';row.appendChild(a);}});
+    QC.appendChild(row);
+  }else if(q.kind==='calc'){
+    QC.innerHTML=`<span style="letter-spacing:2px">${q.expr}</span>`;
+  }else if(q.kind==='visual'){
+    QC.innerHTML='';const wrap=el('div','visual-q-wrap');const qsvg=el('div','visual-q-svg');qsvg.innerHTML=q.svgQ;wrap.appendChild(qsvg);QC.appendChild(wrap);
+    CD.className='visual-choices';CD.innerHTML='';
+    q.choices.forEach(c=>{
+      const b=el('button','vcb');b.innerHTML=`${c.svg}<span class="vcb-label">${c.label}</span>`;
+      b.onclick=()=>{if(answered)return;answered=true;clearInterval(timer);const elapsed=T-timeLeft;
+        document.querySelectorAll('.vcb').forEach(btn=>{btn.disabled=true;if(btn.querySelector('.vcb-label').textContent===q.ans)btn.classList.add('ok');});
+        const ok=c.label===q.ans;if(ok){b.classList.add('ok');hCorrect(elapsed);}else{b.classList.add('no');hWrong();}
+        showFb(ok,q.ans);refreshScore();updateDots();showNextBtn();};
+      CD.appendChild(b);});return;
+  }
+  const choices=makeChoices(q);CD.innerHTML='';
+  const isTxt=choices.some(c=>typeof c==='string'&&c.length>4&&isNaN(Number(c)));
+  choices.forEach(c=>{const b=el('button','cb'+(isTxt?' sm':''));b.textContent=String(c);b.onclick=()=>checkAns(c,b,q.ans);CD.appendChild(b);});
+}
+function hCorrect(elapsed){const base={easy:10,medium:20,hard:35,hell:55}[diff];const tB=Math.round((timeLeft/T)*base*.5);const sB=streak>=5?20:streak>=3?10:0;const pts=base+tB+sB;score+=pts;streak++;correct_++;if(streak>maxStreak)maxStreak=streak;times.push(elapsed);(typeLog[curQ.typeKey]=typeLog[curQ.typeKey]||{c:0,w:0}).c++;results.push('ok');if(streak>=3)showBadge(streak);}
+function hWrong(){streak=0;(typeLog[curQ.typeKey]=typeLog[curQ.typeKey]||{c:0,w:0}).w++;results.push('no');}
+function showFb(ok,correctAns){const fb=document.getElementById('fb');if(ok){fb.className='fb ok';fb.textContent=streak>=5?`🔥 連勝${streak}！`:streak>=3?`⚡ 連勝${streak}！`:`✅ 答對！`;}else{fb.className='fb no';fb.textContent=`❌ 答錯！正確答案是 ${correctAns}`;}}
+function checkAns(chosen,btn,correct){if(answered)return;answered=true;clearInterval(timer);const elapsed=T-timeLeft;document.querySelectorAll('.cb').forEach(b=>{b.disabled=true;if(String(b.textContent)===String(correct))b.classList.add('ok');});const ok=String(chosen)===String(correct);if(ok){btn.classList.add('ok');hCorrect(elapsed);}else{btn.classList.add('no');hWrong();}showFb(ok,correct);refreshScore();updateDots();showNextBtn();}
+function showNextBtn(){const b=document.getElementById('mainBtn');b.style.display='';b.textContent=qi<TOTAL-1?'▶ 下一題':'🏆 查看結果';b.onclick=nextQ;}
+function startTimer(){clearInterval(timer);timeLeft=T;const bar=document.getElementById('tbar'),num=document.getElementById('tnum');bar.style.width='100%';bar.className='tbar';num.textContent=T;
+  timer=setInterval(()=>{timeLeft=Math.max(0,timeLeft-.1);const pct=(timeLeft/T)*100;bar.style.width=pct+'%';num.textContent=Math.ceil(timeLeft);if(pct<20)bar.className='tbar warn';
+    if(timeLeft<=0){clearInterval(timer);if(!answered){answered=true;streak=0;const fb=document.getElementById('fb');fb.className='fb tm';fb.textContent=`⏰ 時間到！正確答案是 ${curQ.ans}`;
+      document.querySelectorAll('.cb,.vcb').forEach(b=>{b.disabled=true;});
+      document.querySelectorAll('.vcb').forEach(b=>{if(b.querySelector('.vcb-label')?.textContent===String(curQ.ans))b.classList.add('ok');});
+      document.querySelectorAll('.cb').forEach(b=>{if(String(b.textContent)===String(curQ.ans))b.classList.add('ok');});
+      (typeLog[curQ.typeKey]=typeLog[curQ.typeKey]||{c:0,w:0}).w++;results.push('tm');refreshScore();updateDots();showNextBtn();}}},100);}
+function nextQ(){qi++;if(qi>=TOTAL){showResult();return;}answered=false;document.getElementById('fb').className='fb';document.getElementById('fb').textContent='';document.getElementById('mainBtn').style.display='none';document.getElementById('vProg').textContent=`${qi+1}/${TOTAL}`;updateDots();render(generateQ());startTimer();}
+function startGame(){running=true;qi=0;score=0;streak=0;maxStreak=0;correct_=0;results=[];times=[];typeLog={};answered=false;document.getElementById('fb').textContent='';document.getElementById('fb').className='fb';document.getElementById('mainBtn').style.display='none';document.getElementById('result').classList.remove('show');document.getElementById('gameArea').style.display='block';document.getElementById('vProg').textContent=`1/${TOTAL}`;initDots();refreshScore();render(generateQ());startTimer();}
+function resetGame(){clearInterval(timer);running=false;qi=0;score=0;streak=0;maxStreak=0;correct_=0;results=[];times=[];typeLog={};answered=false;document.getElementById('fb').textContent='';document.getElementById('fb').className='fb';document.getElementById('qcontent').innerHTML='選好難度和模式<br>按下「開始遊戲」！';document.getElementById('qcontent').style.cssText='color:var(--sub);font-size:1rem;line-height:1.6';document.getElementById('qlabel').textContent='準備好了嗎？';document.getElementById('choices').innerHTML='';document.getElementById('mainBtn').textContent='🚀 開始遊戲';document.getElementById('mainBtn').onclick=startGame;document.getElementById('mainBtn').style.display='';document.getElementById('result').classList.remove('show');document.getElementById('gameArea').style.display='block';document.getElementById('tbar').style.width='100%';document.getElementById('tbar').className='tbar';document.getElementById('tnum').textContent=60;document.getElementById('vProg').textContent='-/20';refreshScore();initDots();}
+function showResult(){clearInterval(timer);document.getElementById('gameArea').style.display='none';document.getElementById('result').classList.add('show');const pct=correct_/TOTAL;const grade=pct>=.95?'S+':pct>=.85?'S':pct>=.7?'A':pct>=.55?'B':pct>=.4?'C':'D';const gc={'S+':'#fbbf24','S':'#34d399','A':'#60a5fa','B':'#a78bfa','C':'#fb923c','D':'#f87171'};document.getElementById('rEmoji').textContent=pct>=.9?'🏆':pct>=.75?'🌟':pct>=.55?'👍':pct>=.4?'💪':'😅';document.getElementById('rTitle').textContent=pct>=.9?'超級天才！':pct>=.75?'非常優秀！':pct>=.55?'繼續加油！':pct>=.4?'還需練習！':'多加油哦！';document.getElementById('rGrade').textContent=grade;document.getElementById('rGrade').style.color=gc[grade];document.getElementById('rSub').textContent=({easy:'🌱簡單(10歲)',medium:'⚡中等(12歲)',hard:'🔥困難(14歲)',hell:'💀地獄(16歲)'}[diff])+` · 共 ${score} 分`;document.getElementById('rScore').textContent=score;document.getElementById('rCorrect').textContent=`${correct_}/${TOTAL}`;document.getElementById('rStreak').textContent=maxStreak;document.getElementById('rAvg').textContent=times.length?(Math.round(times.reduce((a,b)=>a+b,0)/times.length*10)/10)+'s':'-';const tn={math:'🔢 數列規律',calc:'➕ 四則運算',shape:'🔷 圖形規律',missing:'❓ 填空題',spatial:'🧩 空間邏輯'};const tc={math:'#38bdf8',calc:'#34d399',shape:'#fb923c',missing:'#818cf8',spatial:'#f472b6'};const br=document.getElementById('brows');br.innerHTML='';Object.entries(typeLog).forEach(([t,v])=>{const tot=v.c+v.w,p=tot?Math.round(v.c/tot*100):0;br.innerHTML+=`<div class="brow"><div class="bdot" style="background:${tc[t]||'#888'}"></div><span style="flex:0 0 88px;font-size:.78rem">${tn[t]||t}</span><div class="bbg"><div class="bbar" style="width:${p}%;background:${tc[t]||'#888'}"></div></div><span style="font-size:.76rem;color:var(--sub);min-width:52px;text-align:right">${v.c}/${tot} (${p}%)</span></div>`;});}
+function refreshScore(){document.getElementById('vScore').textContent=score;document.getElementById('vStreak').textContent=streak;document.getElementById('vCorrect').textContent=correct_;}
+function initDots(){const d=document.getElementById('pdots');d.innerHTML='';for(let i=0;i<TOTAL;i++){const dot=el('div','dot'+(i===0?' cur':''));d.appendChild(dot);}document.getElementById('plabel').textContent='';}
+function updateDots(){const dots=document.querySelectorAll('.dot');dots.forEach((d,i)=>{d.className='dot';if(i<results.length)d.classList.add(results[i]);else if(i===qi)d.classList.add('cur');});const done=results.length,crt=results.filter(r=>r==='ok').length;document.getElementById('plabel').textContent=done>0?`已完成 ${done}/20 · 正確率 ${Math.round(crt/done*100)}%`:'';
+}
+function showBadge(n){const b=document.getElementById('badge');b.textContent=n>=10?`🔥💀 連勝${n}題！`:n>=7?`🔥🔥 神級連勝${n}！`:n>=5?`🔥 超級連勝${n}！`:`🔥 連勝${n}題！`;b.style.display='block';setTimeout(()=>b.style.display='none',2200);}
+initDots();
+</script>
+</body>
+</html>
