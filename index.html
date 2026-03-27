@@ -1998,47 +1998,433 @@ function gTwoElemRand(){
 }
 
 
+// ══════════════════════════════════════════════════
+// 第四批：大量隨機題型工廠
+// 每個 factory 接受參數，產生不同變體
+// ══════════════════════════════════════════════════
+
+// ── 通用工具 ──────────────────────────────────────
+function numCell2(n, fill, fs=24){
+  const c=SV/2;
+  return `${bg()}<text x="${c}" y="${c}" fill="${fill}" font-size="${fs}" font-family="Baloo 2,cursive" text-anchor="middle" dominant-baseline="middle" font-weight="900">${n}</text>`;
+}
+
+// ── 工廠1：數字運算九宮格（多種規律）──────────────
+// 規律種類：row_add, col_add, row_mul, col_mul, row_sub, diag_add
+function mkNumGrid(rule){
+  const fill=rf(ALL_FILLS);
+  function nc(n){return numCell2(n,fill);}
+  let grid, an, wrongs;
+
+  if(rule==='row_add'){
+    // 每列：a + b = c
+    const rows=Array.from({length:3},()=>{const a=ri(2,15),b=ri(2,15);return[a,b,a+b];});
+    grid=rows;
+    an=grid[2][2];
+    const pool=[an+1,an-1,an+2,an-2,an+3,an-3].filter(n=>n>0&&n!==an);
+    const cells=[];
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++)cells.push(r===2&&c===2?qCell():nc(grid[r][c]));
+    return mkVis(m3x3(cells),nc(an),sh(pool).slice(0,3).map(n=>nc(n)));
+  }
+  if(rule==='col_add'){
+    // 每欄：a + b = c（第三列=前兩列之和）
+    const cols=Array.from({length:3},()=>{const a=ri(2,15),b=ri(2,15);return[a,b,a+b];});
+    an=cols[2][2];
+    const pool=[an+1,an-1,an+2,an-2,an+3].filter(n=>n>0&&n!==an);
+    const cells=[];
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++)cells.push(r===2&&c===2?qCell():nc(cols[c][r]));
+    return mkVis(m3x3(cells),nc(an),sh(pool).slice(0,3).map(n=>nc(n)));
+  }
+  if(rule==='row_mul'){
+    // 每列：a × b = c
+    const rows=Array.from({length:3},()=>{const a=ri(2,9),b=ri(2,9);return[a,b,a*b];});
+    an=rows[2][2];
+    const r2=rows[2];
+    const pool=[r2[0]*(r2[1]+1),(r2[0]+1)*r2[1],r2[0]*(r2[1]-1),an+r2[0],an-r2[1]].filter(n=>n>0&&n!==an);
+    const cells=[];
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++)cells.push(r===2&&c===2?qCell():nc(rows[r][c]));
+    return mkVis(m3x3(cells),nc(an),sh(pool).slice(0,3).map(n=>nc(n)));
+  }
+  if(rule==='col_mul'){
+    // 每欄：a × b = c（第三列=前兩列之積）
+    const cols=Array.from({length:3},()=>{const a=ri(2,7),b=ri(2,7);return[a,b,a*b];});
+    an=cols[2][2];
+    const pool=[cols[2][0]*(cols[2][1]+1),(cols[2][0]+1)*cols[2][1],an+cols[2][0],an-cols[2][1]].filter(n=>n>0&&n!==an);
+    const cells=[];
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++)cells.push(r===2&&c===2?qCell():nc(cols[c][r]));
+    return mkVis(m3x3(cells),nc(an),sh(pool).slice(0,3).map(n=>nc(n)));
+  }
+  if(rule==='row_sub'){
+    // 每列：a - b = c
+    const rows=Array.from({length:3},()=>{const a=ri(8,20),b=ri(1,a-2);return[a,b,a-b];});
+    an=rows[2][2];
+    const pool=[an+1,an-1,an+2,an-2,rows[2][0],rows[2][1]].filter(n=>n>0&&n!==an);
+    const cells=[];
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++)cells.push(r===2&&c===2?qCell():nc(rows[r][c]));
+    return mkVis(m3x3(cells),nc(an),sh(pool).slice(0,3).map(n=>nc(n)));
+  }
+  if(rule==='diag_sum'){
+    // 對角線方向：每格=行+列+offset
+    const off=ri(1,5);
+    function val(r,c){return (r+1)+(c+1)+off;}
+    an=val(2,2);
+    const pool=[an+1,an-1,an+2,an-2].filter(n=>n>0&&n!==an);
+    const cells=[];
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++)cells.push(r===2&&c===2?qCell():nc(val(r,c)));
+    return mkVis(m3x3(cells),nc(an),sh(pool).slice(0,3).map(n=>nc(n)));
+  }
+  return null;
+}
+
+// 快速呼叫包裝
+const gNumGridFactories=[
+  ()=>mkNumGrid('row_add'), ()=>mkNumGrid('col_add'),
+  ()=>mkNumGrid('row_mul'), ()=>mkNumGrid('col_mul'),
+  ()=>mkNumGrid('row_sub'), ()=>mkNumGrid('diag_sum'),
+];
+
+// ── 工廠2：形狀+顏色拉丁方陣（多種形狀組合）──────
+function mkLatinRand(){
+  const c=SV/2,r=18;
+  const [s0,s1,s2]=sh(ALL_SHAPES).slice(0,3);
+  const [f0,f1,f2]=sh(ALL_FILLS).slice(0,3);
+  const shGrid=rf([
+    [[s0,s1,s2],[s1,s2,s0],[s2,s0,s1]], // 右移
+    [[s0,s1,s2],[s2,s0,s1],[s1,s2,s0]], // 左移
+  ]);
+  const rowColor=[f0,f1,f2];
+  function draw(name,fill){return drawAnyShape(name,c,c,r,fill);}
+  function cell(row,col){return `${bg()}${draw(shGrid[row][col],rowColor[row])}`;}
+  const cells=[];
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++)cells.push(row===2&&col===2?qCell():cell(row,col));
+  const correct=cell(2,2);
+  const w1=`${bg()}${draw(shGrid[2][1],rowColor[2])}`;
+  const w2=`${bg()}${draw(shGrid[2][2],rowColor[0])}`;
+  const w3=`${bg()}${draw(shGrid[0][0],rowColor[2])}`;
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// ── 工廠3：多種旋轉步進（形狀+角度）──────────────
+function mkRotStep(step){
+  const c=SV/2;
+  const fill=rf(ALL_FILLS);
+  const shapeFns=[
+    (f)=>`<polygon points="${c-20},${c-22} ${c-6},${c-22} ${c-6},${c+8} ${c+20},${c+8} ${c+20},${c+22} ${c-20},${c+22}" fill="${f}"/>`,
+    (f)=>`<polygon points="${c-20},${c-22} ${c+4},${c-22} ${c+4},${c-4} ${c+20},${c-4} ${c+20},${c+22} ${c-4},${c+22} ${c-4},${c+4} ${c-20},${c+4}" fill="${f}"/>`,
+    (f)=>`<polygon points="${c-18},${c+22} ${c-18},${c-8} ${c},${c-22} ${c+18},${c-8} ${c+18},${c+22}" fill="${f}"/>`,
+    (f)=>`<polygon points="${c-20},${c+22} ${c-20},${c-22} ${c-8},${c-22} ${c-8},${c-4} ${c+22},${c-18} ${c+22},${c-4} ${c-8},${c-4}" fill="${f}"/>`,
+    (f)=>`<polygon points="${c},${c-22} ${c+22},${c+10} ${c-22},${c+10}" fill="${f}"/>`,
+  ];
+  const shFn=rf(shapeFns);
+  function cell(row,col){ const deg=(row*3+col)*step%360; return `${bg()}<g transform="rotate(${deg},${c},${c})">${shFn(fill)}</g>`; }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let cc=0;cc<3;cc++)cells.push(r===2&&cc===2?qCell():cell(r,cc));
+  const ansDeg=(2*3+2)*step%360;
+  return mkVis(m3x3(cells),cell(2,2),[
+    `${bg()}<g transform="rotate(${(ansDeg+step)%360},${c},${c})">${shFn(fill)}</g>`,
+    `${bg()}<g transform="rotate(${(ansDeg-step+360)%360},${c},${c})">${shFn(fill)}</g>`,
+    `${bg()}<g transform="rotate(${(ansDeg+step*2)%360},${c},${c})">${shFn(fill)}</g>`,
+  ]);
+}
+
+// ── 工廠4：同心圓多變體 ────────────────────────────
+function mkConcentric2(dir){
+  // dir: 'col'=欄決定層數, 'row'=行決定層數, 'both'=行+欄
+  const c=SV/2;
+  const shType=rf(['circle','square','diamond']);
+  const fill=rf(ALL_FILLS);
+  function getLayers(r,col){ return dir==='col'?col+1:dir==='row'?r+1:Math.min(r+col+1,4); }
+  function drawC(layers){
+    let s='';
+    for(let i=layers;i>=1;i--){
+      const r2=(c-4)*i/layers; const f=i===layers?fill:'#1a1840';
+      if(shType==='circle')s+=`<circle cx="${c}" cy="${c}" r="${r2}" fill="${f}" stroke="${fill}" stroke-width="1.5"/>`;
+      else if(shType==='square')s+=`<rect x="${c-r2}" y="${c-r2}" width="${r2*2}" height="${r2*2}" fill="${f}" stroke="${fill}" stroke-width="1.5" rx="2"/>`;
+      else s+=`<polygon points="${c},${c-r2} ${c+r2},${c} ${c},${c+r2} ${c-r2},${c}" fill="${f}" stroke="${fill}" stroke-width="1.5"/>`;
+    }
+    return s;
+  }
+  function cell(r,col){return `${bg()}${drawC(getLayers(r,col))}`;}
+  const cells=[];
+  for(let r=0;r<3;r++)for(let cc=0;cc<3;cc++)cells.push(r===2&&cc===2?qCell():cell(r,cc));
+  const ansL=getLayers(2,2);
+  return mkVis(m3x3(cells),cell(2,2),[`${bg()}${drawC(Math.max(1,ansL-1))}`,`${bg()}${drawC(ansL+1)}`,`${bg()}${drawC(Math.max(1,ansL-2))}`]);
+}
+
+// ── 工廠5：大小+形狀雙規律多變體 ──────────────────
+function mkSizeShape(sizeDir, shapeDir){
+  // sizeDir: 'row'/'col' - 哪個維度控制大小
+  // shapeDir: 'row'/'col' - 哪個維度控制形狀
+  const c=SV/2;
+  const shapes=sh(ALL_SHAPES).slice(0,3);
+  const fill=rf(ALL_FILLS);
+  const sizes=[24,16,9];
+  function getSize(r,col){return sizes[sizeDir==='row'?r:col];}
+  function getShape(r,col){return shapes[shapeDir==='row'?r:col];}
+  function cell(r,col){return `${bg()}${drawAnyShape(getShape(r,col),c,c,getSize(r,col),fill)}`;}
+  const cells=[];
+  for(let r=0;r<3;r++)for(let cc=0;cc<3;cc++)cells.push(r===2&&cc===2?qCell():cell(r,cc));
+  const correct=cell(2,2);
+  const w1=`${bg()}${drawAnyShape(getShape(2,2),c,c,sizes[0],fill)}`; // 大小錯
+  const w2=`${bg()}${drawAnyShape(getShape(2,0),c,c,getSize(2,2),fill)}`; // 形狀錯
+  const w3=`${bg()}${drawAnyShape(getShape(2,2),c,c,sizes[1],fill)}`; // 大小錯（中）
+  return mkVis(m3x3(cells),correct,[w1,w2,w3]);
+}
+
+// ── 工廠6：位置+形狀規律 ──────────────────────────
+function mkPosShape(){
+  const SZ=SV/3,c=SV/2;
+  const fill=rf(ALL_FILLS);
+  const shape=rf(['square','circle','diamond']);
+  // row決定y位置（上/中/下），col決定x位置（左/中/右）
+  function cell(row,col){
+    const x=col*SZ+SZ/2, y=row*SZ+SZ/2;
+    const s=shape==='square'?`<rect x="${x-SZ/2+3}" y="${y-SZ/2+3}" width="${SZ-6}" height="${SZ-6}" fill="${fill}" rx="2"/>`:
+             shape==='circle'?`<circle cx="${x}" cy="${y}" r="${SZ/2-4}" fill="${fill}"/>`:
+             `<polygon points="${x},${y-SZ/2+3} ${x-SZ/2+3},${y+SZ/2-3} ${x+SZ/2-3},${y+SZ/2-3}" fill="${fill}"/>`;
+    return `${bg()}${svgGrid(3,'#2a2560')}${s}`;
+  }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let cc=0;cc<3;cc++)cells.push(r===2&&cc===2?qCell():cell(r,cc));
+  return mkVis(m3x3(cells),cell(2,2),[cell(2,0),cell(0,2),cell(1,1)]);
+}
+
+// ── 工廠7：填充漸進（多種形狀）─────────────────────
+function mkFillProg(){
+  const c=SV/2,r=24;
+  const shape=rf(ALL_SHAPES);
+  const fill=rf(ALL_FILLS);
+  const fills2=[sh(ALL_FILLS).find(f=>f!==fill),fill];
+  // col0=空心, col1=半填, col2=全填（隨機選一種形狀）
+  const colStyles=['none',fill+'80',fill];
+  function cell(row,col){
+    const f=colStyles[col];
+    const stroke=fill;
+    if(shape==='circle')return `${bg()}<circle cx="${c}" cy="${c}" r="${r}" fill="${f}" stroke="${stroke}" stroke-width="2"/>`;
+    if(shape==='square')return `${bg()}<rect x="${c-r}" y="${c-r}" width="${r*2}" height="${r*2}" fill="${f}" stroke="${stroke}" stroke-width="2"/>`;
+    if(shape==='triangle')return `${bg()}<polygon points="${c},${c-r} ${c-r*.87},${c+r*.5} ${c+r*.87},${c+r*.5}" fill="${f}" stroke="${stroke}" stroke-width="2"/>`;
+    if(shape==='diamond')return `${bg()}<polygon points="${c},${c-r} ${c+r},${c} ${c},${c+r} ${c-r},${c}" fill="${f}" stroke="${stroke}" stroke-width="2"/>`;
+    return `${bg()}${svgStar5(c,c,r,r*.4,f)}`;
+  }
+  const cells=[];
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++)cells.push(row===2&&col===2?qCell():cell(row,col));
+  return mkVis(m3x3(cells),cell(2,2),[cell(2,0),cell(2,1),cell(0,2)]);
+}
+
+// ── 工廠8：兩個數字的關係（多種運算）──────────────
+function mkNumRelation(op){
+  const c2=SV/2;
+  const [f1,f2]=sh(ALL_FILLS).slice(0,2);
+  function twoNum(a,b,res){
+    return `${bg()}<text x="${c2-14}" y="${c2}" fill="${f1}" font-size="18" font-family="Baloo 2,cursive" text-anchor="middle" dominant-baseline="middle" font-weight="900">${a}</text><text x="${c2+14}" y="${c2}" fill="${f2}" font-size="18" font-family="Baloo 2,cursive" text-anchor="middle" dominant-baseline="middle" font-weight="900">${b}</text>`;
+  }
+  function resNum(n){return numCell2(n,rf(ALL_FILLS.filter(f=>f!==f1&&f!==f2)));}
+  let rows,an,pool;
+  if(op==='+'){
+    rows=Array.from({length:3},()=>{const a=ri(2,12),b=ri(2,12);return{a,b,res:a+b};});
+    an=rows[2].res;
+    pool=[an+1,an-1,an+2,an-2,an+3].filter(n=>n>0&&n!==an);
+  } else if(op==='×'){
+    rows=Array.from({length:3},()=>{const a=ri(2,8),b=ri(2,8);return{a,b,res:a*b};});
+    an=rows[2].res;
+    pool=[rows[2].a*(rows[2].b+1),(rows[2].a+1)*rows[2].b,an+rows[2].a,an-rows[2].b].filter(n=>n>0&&n!==an);
+  } else {
+    rows=Array.from({length:3},()=>{const a=ri(8,20),b=ri(1,a-1);return{a,b,res:a-b};});
+    an=rows[2].res;
+    pool=[an+1,an-1,an+2,an-2,rows[2].a,rows[2].b].filter(n=>n>0&&n!==an);
+  }
+  // 格子：col0=a, col1=b, col2=res
+  const cells=[];
+  for(let r=0;r<3;r++)for(let cc=0;cc<3;cc++){
+    if(r===2&&cc===2){cells.push(qCell());continue;}
+    if(cc<2)cells.push(twoNum(rows[r].a,rows[r].b,rows[r].res));
+    else cells.push(resNum(rows[r].res));
+  }
+  return mkVis(m3x3(cells),resNum(an),sh(pool).slice(0,3).map(n=>resNum(n)));
+}
+
+// ── 工廠9：箭頭方向規律（多種步進）───────────────
+function mkArrowStep(step){
+  const c=SV/2;
+  const fills2=sh(ALL_FILLS).slice(0,3);
+  const R=22,r2=9;
+  function arrow(deg,fill){
+    const body=`<polygon points="${c-R},${c-r2} ${c},${c-r2} ${c},${c-R*0.7} ${c+R},${c} ${c},${c+R*0.7} ${c},${c+r2} ${c-R},${c+r2}" fill="${fill}"/>`;
+    return `<g transform="rotate(${deg},${c},${c})">${body}</g>`;
+  }
+  function cell(row,col){ return `${bg()}${arrow((row+col)*step%360,fills2[row])}`; }
+  const cells=[];
+  for(let r=0;r<3;r++)for(let cc=0;cc<3;cc++)cells.push(r===2&&cc===2?qCell():cell(r,cc));
+  const ansDeg=(2+2)*step%360;
+  return mkVis(m3x3(cells),cell(2,2),[
+    `${bg()}${arrow((ansDeg+step)%360,fills2[2])}`,
+    `${bg()}${arrow((ansDeg-step+360)%360,fills2[2])}`,
+    `${bg()}${arrow(ansDeg,fills2[0])}`,
+  ]);
+}
+
+// ── 工廠10：格線+方塊位置（多種起點）─────────────
+function mkGridBlock(startPos){
+  const SZ=SV/3;
+  const fill=rf(ALL_FILLS);
+  const shape=rf(['square','circle']);
+  function cell(posIdx){
+    const row=Math.floor(posIdx/3),col=posIdx%3;
+    const x=col*SZ,y=row*SZ;
+    const s=shape==='square'?
+      `<rect x="${x+2}" y="${y+2}" width="${SZ-4}" height="${SZ-4}" fill="${fill}" rx="2"/>`:
+      `<circle cx="${x+SZ/2}" cy="${y+SZ/2}" r="${SZ/2-3}" fill="${fill}"/>`;
+    return `${bg()}${svgGrid(3,'#2a2560')}${s}`;
+  }
+  const cells=[...Array(8)].map((_,i)=>cell((startPos+i)%9));
+  cells.push(qCell());
+  return mkVis(m3x3(cells),cell((startPos+8)%9),[cell((startPos+7)%9),cell((startPos+6)%9),cell((startPos+5)%9)]);
+}
+
+// ══ 大量題型包裝器 ══════════════════════════════════
+// 數字運算（6種規律）
+function gNA(){return mkNumGrid('row_add');}
+function gNB(){return mkNumGrid('col_add');}
+function gNC(){return mkNumGrid('row_mul');}
+function gND(){return mkNumGrid('col_mul');}
+function gNE(){return mkNumGrid('row_sub');}
+function gNF(){return mkNumGrid('diag_sum');}
+// 拉丁方陣變體
+function gLA(){return mkLatinRand();}
+function gLB(){return mkLatinRand();}
+function gLC(){return mkLatinRand();}
+// 旋轉步進（多種角度）
+function gRA(){return mkRotStep(30);}
+function gRB(){return mkRotStep(45);}
+function gRC(){return mkRotStep(60);}
+function gRD(){return mkRotStep(90);}
+// 同心圓方向
+function gCA(){return mkConcentric2('col');}
+function gCB(){return mkConcentric2('row');}
+function gCC(){return mkConcentric2('both');}
+// 大小+形狀組合
+function gSA(){return mkSizeShape('row','col');}
+function gSB(){return mkSizeShape('col','row');}
+function gSC(){return mkSizeShape('row','row');}
+function gSD(){return mkSizeShape('col','col');}
+// 位置+形狀
+function gPA(){return mkPosShape();}
+function gPB(){return mkPosShape();}
+function gPC(){return mkPosShape();}
+// 填充漸進
+function gFA(){return mkFillProg();}
+function gFB(){return mkFillProg();}
+function gFC(){return mkFillProg();}
+// 數字關係
+function gQA(){return mkNumRelation('+');}
+function gQB(){return mkNumRelation('×');}
+function gQC(){return mkNumRelation('-');}
+// 箭頭步進
+function gAA(){return mkArrowStep(45);}
+function gAB(){return mkArrowStep(60);}
+function gAC(){return mkArrowStep(90);}
+// 格線方塊
+function gGA(){return mkGridBlock(ri(0,2));}
+function gGB(){return mkGridBlock(ri(3,5));}
+function gGC(){return mkGridBlock(ri(6,8));}
+
+
 const SPATG={
   easy:[
+    // 基礎題型
     ()=>gSize(), ()=>gCount(), ()=>gFill(), ()=>gMove(),
     ()=>gDiagonalRule(), ()=>gProportionRule(), ()=>gDualAttr(),
     ()=>gShapeCount(), ()=>gSizeBySum(), ()=>gCircleMove(),
     ()=>gLineCount(), ()=>gDicePattern(), ()=>gShrinkShape(),
-    ()=>gLatinSquare(), ()=>gGridFill(),
+    ()=>gLatinSquare(), ()=>gGridFill(), ()=>gLineAngle(),
+    // 隨機化（每次不同）
     ()=>gSizeRand(), ()=>gMoveRand(), ()=>gDualAttrRand(),
     ()=>gCountRand(), ()=>gDiagRand(), ()=>gBorderRand(),
+    // 工廠生成
+    ()=>gNA(), ()=>gNB(), ()=>gNE(), ()=>gNF(),
+    ()=>gLA(), ()=>gLB(), ()=>gLC(),
+    ()=>gSA(), ()=>gSB(), ()=>gSC(), ()=>gSD(),
+    ()=>gPA(), ()=>gPB(), ()=>gPC(),
+    ()=>gFA(), ()=>gFB(), ()=>gFC(),
+    ()=>gCA(), ()=>gCB(),
+    ()=>gGA(), ()=>gGB(), ()=>gGC(),
+    ()=>gQA(), ()=>gQC(),
+    ()=>gAA(), ()=>gAC(),
   ],
   medium:[
+    // 基礎題型
     ()=>gConcentric(), ()=>gAdd(), ()=>gSubtractCount(), ()=>gMultiplyCount(),
     ()=>gRowColSum(), ()=>gDiagMove(), ()=>gTwoElements(), ()=>gDualAttr(),
-    ()=>gSizeByProduct(), ()=>gLineAngle(), ()=>gArrowRotate(),
+    ()=>gSizeByProduct(), ()=>gArrowRotate(),
     ()=>gConcentricVar(), ()=>gNestedShapes(), ()=>gBorderWeight(),
     ()=>gShapeAdd(), ()=>gGradientFill(), ()=>gRelativeSize(),
+    ()=>gLatinSquare(), ()=>gDicePattern(),
+    // 隨機化
     ()=>gConcentricRand(), ()=>gAddRand(), ()=>gSubRand(),
     ()=>gNestedRand(), ()=>gRotRand(), ()=>gTwoElemRand(),
-    ()=>gSubstRand(), ()=>gSpiralRand(),
+    ()=>gSubstRand(), ()=>gSpiralRand(), ()=>gSizeRand(),
+    ()=>gDualAttrRand(), ()=>gCountRand(), ()=>gBorderRand(),
+    // 工廠生成
+    ()=>gNA(), ()=>gNB(), ()=>gNC(), ()=>gND(), ()=>gNE(), ()=>gNF(),
+    ()=>gLA(), ()=>gLB(), ()=>gLC(),
+    ()=>gRA(), ()=>gRB(), ()=>gRC(), ()=>gRD(),
+    ()=>gCA(), ()=>gCB(), ()=>gCC(),
+    ()=>gSA(), ()=>gSB(), ()=>gSC(), ()=>gSD(),
+    ()=>gFA(), ()=>gFB(), ()=>gFC(),
+    ()=>gQA(), ()=>gQB(), ()=>gQC(),
+    ()=>gAA(), ()=>gAB(), ()=>gAC(),
+    ()=>gGA(), ()=>gGB(), ()=>gGC(),
+    ()=>gPA(), ()=>gPB(), ()=>gPC(),
   ],
   hard:[
+    // 基礎題型
     ()=>gSubst(), ()=>gConcentric(), ()=>gDiagAdd(), ()=>gRotShape(),
     ()=>gMultiplyCount(), ()=>gTwoElements(), ()=>gDiagonalRule(),
     ()=>gGrid2DFib(), ()=>gLShapeCorner(), ()=>gSeqInGrid(),
     ()=>gSpiralRotate(), ()=>gNestedShapes(), ()=>gConcentricVar(),
-    ()=>gArrowRotate(), ()=>gRelativeSize(),
+    ()=>gArrowRotate(), ()=>gRelativeSize(), ()=>gLatinSquare(),
     ()=>gAnd(), ()=>gOr(), ()=>gXor(),
+    // 隨機化
     ()=>gMultRand(), ()=>gSubstRand(), ()=>gRotRand(),
     ()=>gConcentricRand(), ()=>gNestedRand(), ()=>gDiagRand(),
     ()=>gTwoElemRand(), ()=>gSpiralRand(), ()=>gBorderRand(),
+    ()=>gSizeRand(), ()=>gAddRand(), ()=>gSubRand(),
+    // 工廠生成
+    ()=>gNA(), ()=>gNB(), ()=>gNC(), ()=>gND(), ()=>gNE(), ()=>gNF(),
+    ()=>gLA(), ()=>gLB(), ()=>gLC(),
+    ()=>gRA(), ()=>gRB(), ()=>gRC(), ()=>gRD(),
+    ()=>gCA(), ()=>gCB(), ()=>gCC(),
+    ()=>gSA(), ()=>gSB(), ()=>gSC(), ()=>gSD(),
+    ()=>gFA(), ()=>gFB(), ()=>gFC(),
+    ()=>gQA(), ()=>gQB(), ()=>gQC(),
+    ()=>gAA(), ()=>gAB(), ()=>gAC(),
+    ()=>gGA(), ()=>gGB(), ()=>gGC(),
+    ()=>gPA(), ()=>gPB(), ()=>gPC(),
   ],
   hell:[
+    // 基礎題型
     ()=>gDiagAdd(), ()=>gRotShape(), ()=>gSubst(),
     ()=>gTwoElements(), ()=>gMultiplyCount(), ()=>gDiagMove(), ()=>gSubtractCount(),
     ()=>gGrid2DFib(), ()=>gSpiralRotate(), ()=>gLShapeCorner(),
     ()=>gSeqInGrid(), ()=>gArrowRotate(), ()=>gLatinSquare(),
     ()=>gConcentricVar(), ()=>gNestedShapes(),
     ()=>gAnd(), ()=>gOr(), ()=>gXor(), ()=>gAndAnd(), ()=>gOrAndCombo(),
+    // 隨機化
     ()=>gMultRand(), ()=>gSubstRand(), ()=>gRotRand(),
     ()=>gConcentricRand(), ()=>gNestedRand(), ()=>gSpiralRand(),
     ()=>gAddRand(), ()=>gSubRand(), ()=>gTwoElemRand(),
+    ()=>gDiagRand(), ()=>gBorderRand(), ()=>gSizeRand(),
+    // 工廠生成
+    ()=>gNA(), ()=>gNB(), ()=>gNC(), ()=>gND(), ()=>gNE(), ()=>gNF(),
+    ()=>gLA(), ()=>gLB(), ()=>gLC(),
+    ()=>gRA(), ()=>gRB(), ()=>gRC(), ()=>gRD(),
+    ()=>gCA(), ()=>gCB(), ()=>gCC(),
+    ()=>gSA(), ()=>gSB(), ()=>gSC(), ()=>gSD(),
+    ()=>gFA(), ()=>gFB(), ()=>gFC(),
+    ()=>gQA(), ()=>gQB(), ()=>gQC(),
+    ()=>gAA(), ()=>gAB(), ()=>gAC(),
+    ()=>gGA(), ()=>gGB(), ()=>gGC(),
+    ()=>gPA(), ()=>gPB(), ()=>gPC(),
   ]
 };
 
