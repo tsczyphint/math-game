@@ -660,43 +660,39 @@ function gRotShape(){
 
 // ── 題型：每格數量=列×欄（乘法表規律）──
 function gMultiplyCount(){
-  // 規律：每格點數 = 列乘數 × 欄乘數
-  // rv=[1,2,3], cv=[1,2,3]，乘積最大9，posMap支援1-9
+  // 規律：每格點數 = (列號+1) × (欄號+1)
+  // 結果固定是：1,2,3 / 2,4,6 / 3,6,? = 9
+  // 簡單清楚，不隨機化乘數，避免邏輯錯誤
   const c=SV/2;
   const fill=rf(['#818cf8','#f43f5e','#fbbf24','#22d3ee']);
 
-  // posMap[n]：n個點的排列位置（1-9）
-  const posMap=[
-    [],
-    [[c,c]],
-    [[c-14,c],[c+14,c]],
-    [[c,c-14],[c-14,c+8],[c+14,c+8]],
-    [[c-14,c-14],[c+14,c-14],[c-14,c+14],[c+14,c+14]],
-    [[c,c-16],[c-14,c-4],[c+14,c-4],[c-10,c+14],[c+10,c+14]],
-    [[c-16,c-14],[c,c-14],[c+16,c-14],[c-16,c+14],[c,c+14],[c+16,c+14]],
-    [[c-16,c-16],[c,c-16],[c+16,c-16],[c-16,c],[c+16,c],[c-16,c+16],[c,c+16]],
-    [[c-16,c-16],[c,c-16],[c+16,c-16],[c-16,c],[c,c],[c+16,c],[c-16,c+16],[c+16,c+16]],
-    [[c-16,c-16],[c,c-16],[c+16,c-16],[c-16,c],[c,c],[c+16,c],[c-16,c+16],[c,c+16],[c+16,c+16]],
-  ];
-
-  // 固定用 rv=[1,2,3], cv=[1,2,3]（最大=9，剛好在posMap範圍內）
-  const rv=[1,2,3], cv=[1,2,3];
-
-  function cell(n){
-    const pts=posMap[Math.min(Math.max(n,1),9)];
-    return `${bg()}${pts.map(([px,py])=>svgCirc(px,py,6,fill)).join('')}`;
+  // n個點的排列（1-9）
+  function pts(n){
+    const P=[
+      [],
+      [[c,c]],
+      [[c-14,c],[c+14,c]],
+      [[c,c-14],[c-14,c+8],[c+14,c+8]],
+      [[c-13,c-13],[c+13,c-13],[c-13,c+13],[c+13,c+13]],
+      [[c,c-15],[c-13,c-3],[c+13,c-3],[c-9,c+13],[c+9,c+13]],
+      [[c-15,c-13],[c,c-13],[c+15,c-13],[c-15,c+13],[c,c+13],[c+15,c+13]],
+      [[c-15,c-15],[c,c-15],[c+15,c-15],[c-15,c],[c+15,c],[c-15,c+15],[c,c+15]],
+      [[c-15,c-15],[c,c-15],[c+15,c-15],[c-15,c],[c,c],[c+15,c],[c-15,c+15],[c+15,c+15]],
+      [[c-15,c-15],[c,c-15],[c+15,c-15],[c-15,c],[c,c],[c+15,c],[c-15,c+15],[c,c+15],[c+15,c+15]],
+    ];
+    return P[Math.min(Math.max(n,1),9)];
   }
+  function cell(n){return `${bg()}${pts(n).map(([px,py])=>svgCirc(px,py,6,fill)).join('')}`;}
 
-  // counts[row][col] = rv[row] × cv[col]
-  const counts=rv.map(r=>cv.map(cc=>r*cc));
+  // 固定矩陣：(r+1)*(c+1)
+  // 1,2,3 / 2,4,6 / 3,6,?=9
+  const grid=[[1,2,3],[2,4,6],[3,6,9]];
   const cells=[];
-  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(counts[r][c2]));
-  const an=counts[2][2]; // 3×3=9
+  for(let r=0;r<3;r++)for(let cc=0;cc<3;cc++)cells.push(r===2&&cc===2?qCell():cell(grid[r][cc]));
 
-  // 錯誤選項：不同數量，從合法範圍找不重複的
-  const pool=[1,2,3,4,5,6,7,8].filter(n=>n!==an);
-  const wrongNums=sh(pool).slice(0,3);
-  return mkVis(m3x3(cells),cell(an),wrongNums.map(n=>cell(n)));
+  // 正確答案=9，錯誤選項從不同數量選（確保各不同）
+  const wrongs=sh([6,7,8]).map(n=>cell(n)); // 6,7,8 打亂順序
+  return mkVis(m3x3(cells),cell(9),wrongs);
 }
 
 // ── 題型：XOR格子（第三欄=第一欄 XOR 第二欄）──
@@ -1106,17 +1102,49 @@ function gDicePattern(){
 
 // 每格圖案=上面格+左邊格（二維費氏）
 function gGrid2DFib(){
+  // 規律：每格 = 左格 + 上格
+  // 固定用 a=1,b=1，確保數字在可顯示範圍內
+  // 矩陣：1,1,2 / 1,2,3 / 2,3,?=5
   const c=SV/2;
   const fill=rf(['#818cf8','#f43f5e','#fbbf24','#22d3ee']);
-  const posMap=[[[c,c]],[[c-12,c],[c+12,c]],[[c,c-12],[c-12,c+8],[c+12,c+8]],[[c-12,c-12],[c+12,c-12],[c-12,c+12],[c+12,c+12]],[[c,c-16],[c-14,c-4],[c+14,c-4],[c-10,c+14],[c+10,c+14]],[[c-14,c-14],[c,c-14],[c+14,c-14],[c-14,c+14],[c,c+14],[c+14,c+14]]];
-  function cell(n){return `${bg()}${posMap[Math.min(n-1,5)].map(([px,py])=>svgCirc(px,py,7,fill)).join('')}`;}
-  // grid[r][c]值：row0=[1,1,2], row1=[1,2,3], row2=[2,3,?=5]
-  const a=ri(1,2),b=ri(1,2);
+  const posMap=[
+    [[c,c]],
+    [[c-14,c],[c+14,c]],
+    [[c,c-14],[c-14,c+8],[c+14,c+8]],
+    [[c-13,c-13],[c+13,c-13],[c-13,c+13],[c+13,c+13]],
+    [[c,c-15],[c-13,c-3],[c+13,c-3],[c-9,c+13],[c+9,c+13]],
+    [[c-15,c-13],[c,c-13],[c+15,c-13],[c-15,c+13],[c,c+13],[c+15,c+13]],
+  ];
+  function cell(n){
+    const pts=posMap[Math.min(Math.max(n,1),6)-1];
+    return `${bg()}${pts.map(([px,py])=>svgCirc(px,py,7,fill)).join('')}`;
+  }
+  // 固定矩陣（a=1,b=1）：答案永遠是5
+  // 隨機版：只用 a=1,b=1 或 a=1,b=2（確保最大值≤6）
+  const ab=rf([[1,1],[1,2]]);
+  const a=ab[0],b=ab[1];
+  // grid[r][c] = 左格+上格，起始 grid[0][0]=a, grid[0][1]=b
+  // row0: a, b, a+b
+  // row1: b, a+b, a+2b
+  // row2: a+b, a+2b, 2a+3b
   const grid=[[a,b,a+b],[b,a+b,a+2*b],[a+b,a+2*b,2*a+3*b]];
+  // 確保最大值不超過6
+  if(2*a+3*b>6) {
+    // fallback: a=1,b=1，最大=5
+    const g2=[[1,1,2],[1,2,3],[2,3,5]];
+    const cells2=[];
+    for(let r=0;r<3;r++)for(let cc=0;cc<3;cc++)cells2.push(r===2&&cc===2?qCell():cell(g2[r][cc]));
+    const an2=5;
+    const wrongs2=sh([3,4,6]).map(n=>cell(n));
+    return mkVis(m3x3(cells2),cell(an2),wrongs2);
+  }
   const cells=[];
-  for(let r=0;r<3;r++)for(let c2=0;c2<3;c2++)cells.push(r===2&&c2===2?qCell():cell(grid[r][c2]));
+  for(let r=0;r<3;r++)for(let cc=0;cc<3;cc++)cells.push(r===2&&cc===2?qCell():cell(grid[r][cc]));
   const an=grid[2][2];
-  return mkVis(m3x3(cells),cell(an),[cell(an-1),cell(an+1),cell(an-2)]);
+  // 錯誤選項：確保跟答案不同且在範圍內
+  const pool=[1,2,3,4,5,6].filter(n=>n!==an);
+  const wrongs=sh(pool).slice(0,3).map(n=>cell(n));
+  return mkVis(m3x3(cells),cell(an),wrongs);
 }
 
 // 形狀在格內縮放（每欄縮小），背景顯示輪廓
